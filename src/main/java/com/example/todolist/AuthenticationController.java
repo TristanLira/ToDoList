@@ -5,8 +5,15 @@ import config.UserDAO;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class AuthenticationController {
 
@@ -16,6 +23,9 @@ public class AuthenticationController {
     public PasswordField passwordField;
     public Button loginButton;
     public Button registerButton;
+
+    //BOTÓN PARA INICIAR SESIÓN AUTOMATICAMENTE (DEBUG, BORRAR DESPUÉS)
+    public Button debugButton;
 
     //DAO de usuario
     UserDAO userDAO;
@@ -58,7 +68,14 @@ public class AuthenticationController {
         }
 
         //después de la validación se entra a la cuenta del usuario
-        System.out.println("Sesion iniciada");
+        System.out.println("Sesion iniciada.");
+
+        try {
+            goToMainScene(actionEvent, u);
+        } catch (IOException e) {
+            System.out.println("Error al cargar la nueva escena: " + e);
+            unableToLoadAccountAlert();
+        }
     }
 
     public void createUser(ActionEvent actionEvent) {
@@ -68,6 +85,24 @@ public class AuthenticationController {
         System.out.println(u + "\n");
         userDAO.create(u, this);
     }
+
+    private void goToMainScene(ActionEvent event, User u) throws IOException {
+        //cargar el fxml
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("MainView.fxml"));
+        Parent root = loader.load(); // carga la vista
+
+        //obtiene el controlador de la vista desde el loader e inicializa los datos del usuario loggeado
+        MainController controller = loader.getController();
+        controller.setUser(u, userDAO);
+
+        //obtiene el stage donde está el botón que creó el evento
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        Scene scene = new Scene(root);
+        stage.setScene(scene);
+        stage.show();
+    }
+
+
 
     private User getUserFromFields() {
         User u = new User(userField.getText(), passwordField.getText());
@@ -83,6 +118,13 @@ public class AuthenticationController {
         Alert a = new Alert(Alert.AlertType.ERROR);
         a.setTitle("Error de inicio de sesión!");
         a.setContentText("El usuario o la contraseña son incorrectos.");
+        a.show();
+    }
+
+    public void unableToLoadAccountAlert() {
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Error");
+        a.setContentText("En este momento no es posible cargar su cuenta. Intente en otro momento.");
         a.show();
     }
 
@@ -114,5 +156,13 @@ public class AuthenticationController {
         a.setTitle("Nombre de usuario invalido");
         a.setContentText("Este nombre de usuario ya está siendo utilizado, por favor escoja otro.");
         a.show();
+    }
+
+    /********************** DEBUG ***************************/
+
+    public void quickLogin(ActionEvent actionEvent) {
+        try {
+            goToMainScene(actionEvent, new User("TristanLira", "password"));
+        } catch (IOException e) {}
     }
 }
