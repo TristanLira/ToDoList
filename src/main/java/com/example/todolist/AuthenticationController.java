@@ -163,6 +163,8 @@ public class AuthenticationController {
     public void quickLogin(ActionEvent actionEvent) {
         try {
             goToMainScene(actionEvent, new User("TristanLira", "password"));
-        } catch (IOException e) {}
+        } catch (IOException e) {
+            System.out.println("error al cargar la escena: " + e);
+        }
     }
 }

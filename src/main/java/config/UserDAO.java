@@ -51,6 +51,7 @@ public class UserDAO {
             @Override public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
             @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
             @Override public void onCancelled(DatabaseError databaseError) {}
+
         });
     }
 

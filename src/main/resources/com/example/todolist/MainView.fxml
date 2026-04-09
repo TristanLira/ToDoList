@@ -10,7 +10,8 @@
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.example.todolist.MainController"
-          prefHeight="400.0" prefWidth="600.0">
+          prefHeight="400.0" prefWidth="600.0"
+          stylesheets="@css/main.css">
 
     <padding>
         <Insets top="20" right="20" bottom="20" left="20"/>
@@ -24,20 +25,50 @@
     <VBox spacing = "20" GridPane.rowIndex="0" GridPane.columnIndex="0">
 
         <Label text = "To Do List"/>
-        <Button text = "prueba" />
+
+        <Button fx:id = "showTodoSection" onAction = "#showTodoSection" text = "Tareas pendientes"/>
+        <Button fx:id = "showCategorySection" onAction = "#showCategorySection" text = "Registrar categoria"/>
 
     </VBox>
 
-    <StackPane GridPane.rowIndex="0" GridPane.columnIndex="1">
+    <!-- Este scroll pane envuelve el stack pane que mostrará las diferentes
+    secciones de la aplicación dependiendo que seleccione el usuario-->
 
-        <ScrollPane>
+    <ScrollPane GridPane.rowIndex="0" GridPane.columnIndex="1"
+                maxWidth="Infinity" maxHeight="Infinity"
+                fitToWidth="true" fitToHeight="true">
 
-            <VBox fx:id = "todoVBox" alignment="TOP_CENTER">
-                <Label text = "Tareas pendientes"/>
+        <StackPane maxWidth="Infinity">
+
+            <!--todoSection-->
+            <VBox fx:id="todoSection" spacing="20">
+                <Label text = "Tareas pendientes" styleClass="section-title"/>
             </VBox>
 
-        </ScrollPane>
+            <!--categorySection-->
+            <VBox fx:id="categorySection" spacing="50">
 
-    </StackPane>
+                <VBox alignment="CENTER">
+                    <Label text = "Registrar categoría" styleClass="section-title"/>
+                    <GridPane alignment="CENTER" hgap = "10" vgap="10">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <Label alignment="CENTER_RIGHT" text = "nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="form-label"/>
+                        <Label alignment="CENTER_RIGHT" text = "color:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="form-label"/>
+                        <TextField fx:id = "categoryNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <ComboBox fx:id = "categoryColorComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
+                    </GridPane>
+                    <Button fx:id = "categorySaveButton" onAction="#saveCategory" text = "Guardar"/>
+                    <Button fx:id = "printCategoriesButton" onAction="#printCategories" text = "Imprimir (debug)"/>
+                </VBox>
+
+                <Label text = "Categorías creadas:" styleClass = "section-subtitle"/>
+            </VBox>
+
+        </StackPane>
+
+    </ScrollPane>
+
 
 </GridPane>
