@@ -27,8 +27,8 @@
                 <Insets top="20" right="20" bottom="20" left="20"/>
             </padding>
 
-            <Label alignment="CENTER_RIGHT" text = "Usuario" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-            <Label alignment="CENTER_RIGHT" text = "Contraseña" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+            <Label alignment="CENTER_RIGHT" text = "Usuario:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+            <Label alignment="CENTER_RIGHT" text = "Contraseña:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
             <TextField fx:id = "userField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
             <PasswordField fx:id = "passwordField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
         </GridPane>

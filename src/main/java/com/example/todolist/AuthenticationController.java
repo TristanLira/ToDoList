@@ -23,6 +23,21 @@ public class AuthenticationController {
     @FXML
     public void initialize() {
         userDAO = new UserDAO(); //crea el dao
+
+        //PRUEBA PARA VALIDACIÓN DE USUARIOS
+        /*User u1 = new User("TristanLira", "12345678");  //VALIDO
+        User u2 = new User("TristanLira", "holahola");  //INVALIDO
+        User u3 = new User("usuario3", "password");     //VALIDO
+        User u4 = new User("usuario_4", "password");    //VALIDO
+        User u5 = new User("usuario 5", "password");    //INVALIDO
+        User u6 = new User("u6", "password");           //INVALIDO
+
+        userDAO.create(u1);
+        userDAO.create(u2);
+        userDAO.create(u3);
+        userDAO.create(u4);
+        userDAO.create(u5);
+        userDAO.create(u6);*/
     }
 
     private void cleanFields() {
@@ -32,13 +47,9 @@ public class AuthenticationController {
 
     public void login(ActionEvent actionEvent) {
         ObservableList<User> users = userDAO.getUsers();
-        User u = new User(userField.getText(), passwordField.getText());
-        System.out.println(u + "\n");
-        cleanFields();
+        User u = getUserFromFields();
 
-        System.out.println("usuarios:");
-        for (User i: users) System.out.println(i);
-        System.out.println();
+        System.out.println(u + "\n"); //usuario recuperado
 
         //VALIDACIÓN DE USUARIO Y CONTRASEÑA
         if (!users.contains(u)) {
@@ -46,8 +57,27 @@ public class AuthenticationController {
             return;
         }
 
-        System.out.println("Sesión iniciada");
+        //después de la validación se entra a la cuenta del usuario
+        System.out.println("Sesion iniciada");
     }
+
+    public void createUser(ActionEvent actionEvent) {
+        /*llama al evento para crear el usuario y termina. Ya que create recibe la instancia del controlador,
+        * una vez termina el evento el DAO indica el resultado usando los métodos de alerta.*/
+        User u = getUserFromFields();
+        System.out.println(u + "\n");
+        userDAO.create(u, this);
+    }
+
+    private User getUserFromFields() {
+        User u = new User(userField.getText(), passwordField.getText());
+        cleanFields();
+        return u;
+    }
+
+    /************************* ALERTAS PARA LA SECCIÓN DE INICIO DE SESIÓN *************************/
+
+    //para el inicio de sesión
 
     private void nonExistentUserAlert() {
         Alert a = new Alert(Alert.AlertType.ERROR);
@@ -56,6 +86,33 @@ public class AuthenticationController {
         a.show();
     }
 
-    public void createUser(ActionEvent actionEvent) {
+    //para el registro de usuario
+
+    public void invalidUserAlert() {
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setTitle("Usuario inválido");
+        a.setContentText("El usuario ingresado no es válido. Asegurate que contenga como mínimo 6 carácteres y no incluya espacios ni caractéres especiales.");
+        a.show();
+    }
+
+    public void invalidPasswordAlert() {
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setTitle("Contraseña inválida");
+        a.setContentText("La contraseña ingresada no es válida. Asegurate que contenga como mínimo 8 carácteres.");
+        a.show();
+    }
+
+    public void userCreatedAlert() {
+        Alert a = new Alert(Alert.AlertType.INFORMATION);
+        a.setTitle("Usuario creado");
+        a.setContentText("El usuario fue creado exitosamente! Inicia sesión para continuar.");
+        a.show();
+    }
+
+    public void userAlreadyExistAlert() {
+        Alert a = new Alert(Alert.AlertType.ERROR);
+        a.setTitle("Nombre de usuario invalido");
+        a.setContentText("Este nombre de usuario ya está siendo utilizado, por favor escoja otro.");
+        a.show();
     }
 }

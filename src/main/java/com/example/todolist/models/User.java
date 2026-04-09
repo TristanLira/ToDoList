@@ -46,5 +46,4 @@ public class User {
 
         return u.getUser().equals(this.user) && u.getPassword().equals(this.password);
     }
-
 }
