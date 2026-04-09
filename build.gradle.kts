@@ -37,6 +37,7 @@ javafx {
 
 dependencies {
     implementation("org.kordamp.ikonli:ikonli-javafx:12.3.1")
+    implementation("org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
     implementation("com.google.firebase:firebase-admin:9.8.0")

@@ -112,7 +112,7 @@
     -fx-text-fill: #3a6f73;
 
     -fx-font-size: 18px;
-    -fx-font-weight: 600;
+    -fx-font-weight: bold;
 
     -fx-alignment: CENTER_LEFT;
     -fx-padding: 12 16 12 16;
@@ -126,5 +126,13 @@
 .section-menu-button:hover {
     -fx-background-color: #cdeeee;
     -fx-text-fill: #2c7a7b;
+}
+
+.icon-section {
+    -fx-icon-color: #3a6f73;
+}
+
+.icon-button {
+    -fx-icon-color: #ffffff;
 }
 

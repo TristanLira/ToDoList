@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.example.todolist.MainController"
@@ -37,11 +38,19 @@
 
         <Label prefHeight="20"/> <!--spacing manual-->
 
-        <Button fx:id = "showTodoSection" onAction = "#showTodoSection" text = "Tareas pendientes"
-                maxWidth="Infinity" styleClass="section-menu-button"/>
+        <Button fx:id = "showTodoSection" onAction = "#showTodoSection" text = " Tareas pendientes"
+                maxWidth="Infinity" styleClass="section-menu-button">
+            <graphic>
+                <FontIcon iconLiteral="fas-list" styleClass="icon-section"/>
+            </graphic>
+        </Button>
 
-        <Button fx:id = "showCategorySection" onAction = "#showCategorySection" text = "Registrar categoria"
-                maxWidth="Infinity" styleClass="section-menu-button"/>
+        <Button fx:id = "showCategorySection" onAction = "#showCategorySection" text = " Registrar categoria"
+                maxWidth="Infinity" styleClass="section-menu-button">
+            <graphic>
+                <FontIcon iconLiteral="fas-edit" styleClass="icon-section"/>
+            </graphic>
+        </Button>
 
     </VBox>
 
@@ -76,7 +85,7 @@
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
 
-                <VBox alignment="CENTER" spacing="10" fillWidth="false">
+                <VBox alignment="CENTER" spacing="25" fillWidth="false">
                     <Label text = "Registrar categoría" styleClass="section-title"/>
                     <GridPane alignment="CENTER" hgap = "10" vgap="10" styleClass="grid-card">
                         <padding>
@@ -87,7 +96,12 @@
                         <TextField fx:id = "categoryNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
                         <ComboBox fx:id = "categoryColorComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
                     </GridPane>
-                    <Button fx:id = "categorySaveButton" onAction="#saveCategory" text = "Guardar"/>
+
+                    <Button fx:id = "categorySaveButton" onAction="#saveCategory" text = " Guardar">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-save" styleClass="icon-button"/>
+                        </graphic>
+                    </Button>
                 </VBox>
 
                 <Label text = "Tus categorías" styleClass = "section-subtitle"/>

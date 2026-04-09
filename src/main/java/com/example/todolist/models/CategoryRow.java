@@ -7,6 +7,8 @@ import javafx.geometry.VPos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import org.kordamp.ikonli.javafx.FontIcon;
 
 public class CategoryRow extends GridPane {
 
@@ -22,6 +24,10 @@ public class CategoryRow extends GridPane {
         colorLabel = new Label();
         nameLabel = new Label(c.getName());
         deleteButton = new Button("Eliminar");
+
+        FontIcon icon = new FontIcon("fas-eraser");
+        icon.setIconColor(Color.WHITE);
+        deleteButton.setGraphic(icon);
 
         build();
     }
