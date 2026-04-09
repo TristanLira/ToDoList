@@ -1,6 +1,7 @@
 package com.example.todolist;
 
 import com.example.todolist.models.Category;
+import com.example.todolist.models.CategoryRow;
 import com.example.todolist.models.ComboColor;
 import com.example.todolist.models.User;
 import config.CategoryDAO;
@@ -8,13 +9,17 @@ import config.UserDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.event.Event;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
 public class MainController {
+
+    //menú
+    public Label displayUserLabel;
 
     //todoSection
     public Button showTodoSection;
@@ -27,7 +32,8 @@ public class MainController {
     public ComboBox <ComboColor> categoryColorComboBox;
     public Button categorySaveButton;
     public Button printCategoriesButton;
-
+    private ObservableList<Category> categories;
+    private ObservableList<CategoryRow> catRows;
 
     //DAOs
     UserDAO userDAO;
@@ -61,9 +67,11 @@ public class MainController {
         /*ya que los DAOs de category y task necesitan el usuario loggeado,
         * se inicializan aquí, hasta haberlo recibido en esta función*/
         this.catDAO = new CategoryDAO(logged);
+
+        displayUserLabel.setText("Bienvenido, " + logged.getUser() + ".");
     }
 
-    /***************** METODOS PARA LA SECCIÓN DE CATEGORÍAS ***********************/
+    /****************************** METODOS PARA LA SECCIÓN DE CATEGORÍAS ******************************/
 
     private void cleanCategoryFields() {
         categoryNameField.clear();
@@ -72,20 +80,61 @@ public class MainController {
 
     public void saveCategory(ActionEvent actionEvent) {
         Category c = getCategoryFromFields();
-        catDAO.create(c);
+
+        /*escribe la entidad en la base de datos, pasando dos metodos. Si la escritura es exitosa, llama a loadCategories,
+        * que recarga las CategoryRows dentro de la GUI, pero si no llama a la alerta para indicar al usuario del error.*/
+        catDAO.create(c, () -> loadCategories(), () -> invalidCategoryNameAlert());
     }
 
     private Category getCategoryFromFields() {
-        Category c = new Category(logged.getUser(), categoryNameField.getText(), categoryColorComboBox.getValue().color);
+        //revisa si el color no es null, y si lo es le da el azul como default
+        Color catColor;
+        if (categoryColorComboBox.getValue() == null) {
+            catColor = categoryColorComboBox.getItems().get(2).color;
+        } else {
+            catColor = categoryColorComboBox.getValue().color;
+        }
+
+        Category c = new Category(logged.getUser(), categoryNameField.getText(), catColor);
         cleanCategoryFields();
         return c;
     }
 
-    public void printCategories(ActionEvent actionEvent) {
-        ObservableList<Category> categories = catDAO.getCategories();
+    //Carga las categorías a la lista y crea los CategoryRow
+    public void loadCategories() {
+        //limpia las categories obtenidas del dao
+        categories = null;
+        categories = catDAO.getCategories();
 
-        System.out.println("Categorías de " + logged.getUser() + ": ");
-        for (Category i: categories) System.out.println(i);
+        //limpia la lista de rows
+        removeRowsFromGUI();
+        catRows = FXCollections.observableArrayList();
+
+
+        /*los objetos CategoryRow son nodos que extienden de GridPane, muestran una
+        * category dentro de la GUI como una columna de una tabla.*/
+        for (Category i: categories) {
+            CategoryRow cr = new CategoryRow(i);
+            catRows.add(cr);
+
+            //agrega un evento para eliminar tanto Category de la bse de datos como su row
+            cr.getDeleteButton().setOnAction(actionEvent -> {
+                catDAO.delete(i, () -> loadCategories()); //el delete recarga las categorías cargadas para actualizar la lista
+                categorySection.getChildren().remove(cr);
+            });
+
+            categorySection.getChildren().add(cr);
+        }
+    }
+
+    private void removeRowsFromGUI() {
+        if (catRows == null) return;
+
+        for (CategoryRow i: catRows) {
+            categorySection.getChildren().remove(i);
+        }
+
+        catRows = null;
     }
 
     private void initCategoryComboBox() {
@@ -98,6 +147,13 @@ public class MainController {
                 new ComboColor(Color.web("#F7D9C4"), "Naranja")
         );
         categoryColorComboBox.setItems(items);
+    }
+
+    public void invalidCategoryNameAlert() {
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setTitle("Nombre de categoría invalido");
+        a.setContentText("El nombre de la categoría no es válido. Asegurate que tenga entre 4 y 30 carácteres.");
+        a.show();
     }
 
 
@@ -120,6 +176,7 @@ public class MainController {
 
         cleanCategoryFields();
         initCategoryComboBox();
+        loadCategories();
     }
 
 }

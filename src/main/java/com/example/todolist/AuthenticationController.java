@@ -96,9 +96,10 @@ public class AuthenticationController {
         controller.setUser(u, userDAO);
 
         //obtiene el stage donde está el botón que creó el evento
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
+        Scene authenticationScene = ((Node) event.getSource()).getScene();
+        Stage stage = (Stage) authenticationScene.getWindow();
+        Scene mainScene = new Scene(root, authenticationScene.getWidth(), authenticationScene.getHeight());
+        stage.setScene(mainScene);
         stage.show();
     }
 

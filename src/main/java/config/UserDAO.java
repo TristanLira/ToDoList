@@ -29,7 +29,7 @@ public class UserDAO {
     }
 
     public ObservableList<User> getUsers() {
-        return users;
+        return FXCollections.observableArrayList(users); //clona la lista
     }
 
     //suscribe el dao a los eventos
@@ -55,7 +55,7 @@ public class UserDAO {
         });
     }
 
-    //Este metodo se usa para crear usuarios en la base de datos desde cualquier parte del código
+    //create simple
     public void create(User u) {
 
         if (invalidUser(u)) {

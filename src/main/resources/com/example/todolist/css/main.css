@@ -1,5 +1,130 @@
-.section-title{}
+/*Fondo general*/
+.root {
+    -fx-background-color: #f7fcfc;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
 
-.section-subtitle{}
+/*Menú lateral*/
+.section-menu {
+    -fx-background-color: #e6f7f7;
+}
 
-.form-label{}
+/*Área principal*/
+.section-space {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.section-space > .viewport {
+    -fx-background-color: #f7fcfc;
+}
+
+.scroll-pane {
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .corner {
+    -fx-background-color: transparent;
+}
+
+/*Texto normal*/
+.label {
+    -fx-font-size: 15px;
+    -fx-text-fill: #3a6f73;
+}
+
+/*Título principal*/
+.section-title {
+    -fx-font-size: 34px;
+    -fx-text-fill: #2c7a7b;
+    -fx-font-weight: bold;
+}
+
+/*Subtítulo*/
+.section-subtitle {
+    -fx-font-size: 26px;
+    -fx-text-fill: #3a6f73;
+    -fx-font-weight: bold;
+}
+
+/*Texto medio*/
+.medium-text {
+    -fx-font-size: 18px;
+    -fx-text-fill: #3a6f73;
+}
+
+/*GridPane como tarjeta*/
+.grid-card {
+    -fx-background-color: #d0eeee;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-padding: 25;
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 14, 0.3, 0, 5);
+}
+
+/*Campos de texto*/
+.text-field,
+.combo-box {
+    -fx-font-size: 15px;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #7fcacb;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-padding: 8 12 8 12;
+}
+
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #3a6f73;
+}
+
+/*Botones*/
+.button {
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-background-color: #76c7c0;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 14;
+    -fx-padding: 10 20 10 20;
+}
+
+/*Hover botón*/
+.button:hover {
+    -fx-background-color: #5fb3ad;
+}
+
+/*Botón presionado*/
+.button:pressed {
+    -fx-background-color: #4aa19b;
+}
+
+.section-menu-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #3a6f73;
+
+    -fx-font-size: 18px;
+    -fx-font-weight: 600;
+
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 12 16 12 16;
+
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+
+    -fx-border-color: transparent;
+}
+
+.section-menu-button:hover {
+    -fx-background-color: #cdeeee;
+    -fx-text-fill: #2c7a7b;
+}
+

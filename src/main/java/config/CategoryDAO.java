@@ -1,10 +1,17 @@
 package config;
 
+import com.example.todolist.MainController;
 import com.example.todolist.models.Category;
+import com.example.todolist.models.ComboColor;
 import com.example.todolist.models.User;
 import com.google.firebase.database.*;
+import com.google.firebase.database.core.SyncTree;
+import com.google.firebase.database.core.view.Event;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.util.List;
 
 
 public class CategoryDAO {
@@ -57,16 +64,46 @@ public class CategoryDAO {
     }
 
     public ObservableList<Category> getCategories() {
-        return categories;
+        return FXCollections.observableArrayList(categories); //clona la lista
     }
 
+    //create simple
     public void create(Category c) {
         //obtiene el id
+        if (c.getName().length() > 30 || c.getName().length() < 4) {
+            System.out.println("No se pudo crear la categoría \"" + c.getName() + "\" (" + c.getUserId() + ")");
+            return;
+        }
+        DatabaseReference pushed = ref.push();
+        c.setId(pushed.getKey());
+        //guarda la categoria
+        pushed.setValueAsync(c);
+    }
+
+    //create con callbacks, ejecutan una acción si
+    public void create(Category c, Runnable success, Runnable fail) {
+        //obtiene el id
+        if (c.getName().length() > 30 || c.getName().length() < 4) {
+            System.out.println("No se pudo crear la categoría \"" + c.getName() + "\" (" + c.getUserId() + ")");
+            Platform.runLater(fail);
+            return;
+        }
+
+        //genera el id
         DatabaseReference pushed = ref.push();
         c.setId(pushed.getKey());
 
-        //guarda la categoria
-        pushed.setValueAsync(c);
+        //guarda la categoria, cuando se completa el guardado ejecuta el runnable de success
+        pushed.setValue(c, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError error, DatabaseReference ref) {
+                if (error == null) {
+                    Platform.runLater(success);
+                } else {
+                    System.out.println("Error al registrar la categoria " + c.getName() + "(" + c.getUserId() + ")");
+                }
+            }
+        });
     }
 
     //El objeto category que reciba puede ser diferente en todos los campos menos en el id generado por firebase
@@ -75,7 +112,23 @@ public class CategoryDAO {
         ref.child(updated.getId()).setValueAsync(updated);
     }
 
+    //TODO eliminar también todas las tareas que contenían la categoria eliminada de la base de datos.
+
+    //delete simple
     public void delete(Category c) {
         ref.child(c.getId()).removeValueAsync();
+    }
+
+    //delete con callback
+    public void delete(Category c, Runnable success) {
+        ref.child(c.getId()).removeValue(new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError error, DatabaseReference ref) {
+                if (error == null) {
+                    System.out.println("Categoria \"" + c.getName() + "\" eliminada correctamente.");
+                    Platform.runLater(success);
+                }
+            }
+        });
     }
 }
