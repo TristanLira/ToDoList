@@ -17,6 +17,7 @@ public class MainController {
 
     //menú
     public Label displayUserLabel;
+    public ScrollPane sectionScrollPane;
 
     //todoSection
     public Button showTodoSection;
@@ -167,7 +168,7 @@ public class MainController {
                 new ComboColor(Color.web("#C9E4DE"), "Verde"),
                 new ComboColor(Color.web("#C6DEF1"), "Azul"),
                 new ComboColor(Color.web("#DBCDF0"), "Morado"),
-                new ComboColor(Color.web("#F2C6DE"), "Rosa"),
+                new ComboColor(Color.web("#F2C6DE"), "Rojo"),
                 new ComboColor(Color.web("#F7D9C4"), "Naranja")
         );
         categoryColorComboBox.setItems(items);
@@ -253,10 +254,22 @@ public class MainController {
     /****************************** métodos para todoSection ******************************/
 
     //carga la lista de tasks y los objetos TasksRow que las representan
-    private void loadTasks() {}
+    public void loadTasks() {
+        loadTasksList();
+        Task t = taskDAO.get("-OppNIYx4ogd9YEjnv0Q");
+        Category c = catDAO.get(t.getCategoryId());
+        if (t == null || c == null) return;
+        TaskRow tr = new TaskRow(t,c);
+        todoSection.getChildren().add(tr);
+    }
 
     private void loadTasksList() {
         tasks.setAll(taskDAO.getAll());
+        System.out.println("Tareas: ");
+        for (Task i: tasks) {
+            System.out.println(i);
+        }
+        System.out.println();
     }
 
     /****************************** métodos para mostrar cada sección ******************************/
@@ -267,6 +280,10 @@ public class MainController {
 
         categorySection.setVisible(false);
         taskSection.setVisible(false);
+
+        //-------------------------------
+
+        loadTasksList();
     }
 
     public void showCategorySection(ActionEvent actionEvent) {

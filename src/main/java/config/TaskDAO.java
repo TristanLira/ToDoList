@@ -56,6 +56,15 @@ public class TaskDAO implements DAO <Task>{
         });
     }
 
+    public Task get(String id) {
+        for (Task i: tasks) {
+            if (i.getId().equals(id)) {
+                return i;
+            }
+        }
+        return null;
+    }
+
     /******************************** operaciones CRUD ********************************/
 
     @Override

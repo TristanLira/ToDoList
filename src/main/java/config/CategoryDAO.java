@@ -57,6 +57,13 @@ public class CategoryDAO implements DAO<Category> {
         });
     }
 
+    public Category get(String id) {
+        for (Category i: categories) {
+            if (i.getId().equals(id)) return i;
+        }
+        return null;
+    }
+
     /******************************** operaciones CRUD ********************************/
 
     @Override

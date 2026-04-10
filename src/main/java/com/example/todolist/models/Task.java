@@ -33,7 +33,7 @@ public class Task {
     public Task() {}
 
     public LocalDate obtainCreationObj() {
-        return deadlineObj;
+        return creationObj;
     }
 
     public LocalDate obtainDeadlineObj() {
@@ -86,6 +86,7 @@ public class Task {
 
     public void setCreation(String creation) {
         this.creation = creation;
+        this.creationObj = LocalDate.parse(creation);
     }
 
     public String getDeadline() {
@@ -113,6 +114,6 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Tarea: " + name + ", limite: " + deadline;
+        return "Tarea: " + name + ", creación: " + creation + ", limite: " + deadline;
     }
 }

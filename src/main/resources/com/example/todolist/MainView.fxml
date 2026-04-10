@@ -64,7 +64,8 @@
     <!-- Este scroll pane envuelve el stack pane que mostrará las diferentes
     secciones de la aplicación dependiendo que seleccione el usuario-->
 
-    <ScrollPane GridPane.rowIndex="0" GridPane.columnIndex="1"
+    <ScrollPane fx:id = "sectionScrollPane"
+                GridPane.rowIndex="0" GridPane.columnIndex="1"
                 maxWidth="Infinity" maxHeight="Infinity"
                 fitToWidth="true" fitToHeight="true"
                 styleClass="section-space">
@@ -82,6 +83,7 @@
                 </padding>
 
                 <Label text = "Tareas pendientes" styleClass="section-title"/>
+                <Button text = "crear" onAction="#loadTasks"/>
             </VBox>
 
             <!--categorySection-->

@@ -2,6 +2,8 @@ package config;
 
 import javafx.collections.ObservableList;
 
+import java.util.Optional;
+
 public interface DAO<T> {
 
     ObservableList<T> getAll();
