@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.regex.*;
 
-public class UserDAO {
+public class UserDAO implements DAO<User> {
 
     //regex para validar usuarios y contraseñas
     public static final String USER_PASSWORD_REGEX = "[a-zA-Z0-9_-]*";
@@ -17,16 +17,12 @@ public class UserDAO {
     DatabaseReference ref; //referencia a la tabla de usuarios
     ObservableList<User> users;
 
-    public UserDAO(){
+    public UserDAO() {
         ref = FirebaseConnection.getDB().getReference("users");
         users = FXCollections.observableArrayList();
         subscribe();
 
         pattern = Pattern.compile(USER_PASSWORD_REGEX);
-    }
-
-    public ObservableList<User> getAll() {
-        return FXCollections.observableArrayList(users); //clona la lista
     }
 
     //suscribe el dao a los eventos
@@ -52,7 +48,15 @@ public class UserDAO {
         });
     }
 
-    //create simple
+    /******************************** operaciones CRUD ********************************/
+
+    @Override
+    public ObservableList<User> getAll() {
+        //return FXCollections.observableArrayList(users); //clona la lista
+        return users;
+    }
+
+    @Override
     public void create(User u) {
 
         if (invalidUser(u)) {
@@ -82,8 +86,30 @@ public class UserDAO {
 
     }
 
+    //los usuarios son inmutables por lo que no agrega ninguna funcionalidad
+    @Override
+    public void update(User u) {}
+
+    @Override
+    public void delete(User u) {
+        ref.child(u.getUser()).removeValueAsync();
+    }
+
+
+    /******************************** otros metodos ********************************/
+
+    //validación para el usuario y contraseña, antes de registrar el usuario a la base de datos
+    private boolean invalidUser(User u) {
+        Matcher matcher = pattern.matcher(u.getUser());
+        return !matcher.matches() || u.getUser().length() < 4 || u.getUser().length() > 15;
+    }
+    private boolean invalidPassword(User u) {
+        Matcher matcher = pattern.matcher(u.getPassword());
+        return !matcher.matches() || u.getPassword().length() < 8 || u.getPassword().length() > 20;
+    }
+
     /*En esta otra versión del metodo se recibe el controlador específico de donde fue llamada, para poder notificar
-    * dentro de la UI de creación de usuario el resultado (ya sea si se creó exitosamente o si hubo algún error)*/
+     * dentro de la UI de creación de usuario el resultado (ya sea si se creó exitosamente o si hubo algún error)*/
     public void create(User u, AuthenticationController ac) {
 
         if (invalidUser(u)) {
@@ -123,22 +149,4 @@ public class UserDAO {
         });
 
     }
-
-    //validación para el usuario y contraseña, antes de registrar el usuario a la base de datos
-    private boolean invalidUser(User u) {
-        Matcher matcher = pattern.matcher(u.getUser());
-        return !matcher.matches() || u.getUser().length() < 4 || u.getUser().length() > 15;
-    }
-    private boolean invalidPassword(User u) {
-        Matcher matcher = pattern.matcher(u.getPassword());
-        return !matcher.matches() || u.getPassword().length() < 8 || u.getPassword().length() > 20;
-    }
-
-    //los usuarios son inmutables por lo que no agrega ninguna funcionalidad
-    public void update() {}
-
-    public void delete(User u) {
-        ref.child(u.getUser()).removeValueAsync();
-    }
-
 }

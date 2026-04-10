@@ -8,7 +8,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 
-public class CategoryDAO {
+public class CategoryDAO implements DAO<Category> {
 
     //usuario al que se le van a registrar las categorías aquí creadas
     private final User logged;
@@ -57,12 +57,15 @@ public class CategoryDAO {
         });
     }
 
+    /******************************** operaciones CRUD ********************************/
+
+    @Override
     public ObservableList<Category> getAll() {
         //return FXCollections.observableArrayList(categories); //clona la lista
         return categories;
     }
 
-    //create simple
+    @Override
     public void create(Category c) {
         //obtiene el id
         if (c.getName().length() > 15 || c.getName().length() < 4) {
@@ -75,7 +78,20 @@ public class CategoryDAO {
         pushed.setValueAsync(c);
     }
 
-    //create con callbacks, ejecutan una acción si
+    //El objeto category que reciba puede ser diferente en todos los campos menos en el id generado por firebase
+    @Override
+    public void update(Category updated) {
+        if (!categories.contains(updated)) return;
+        ref.child(updated.getId()).setValueAsync(updated);
+    }
+
+    @Override
+    public void delete(Category c) {
+        ref.child(c.getId()).removeValueAsync();
+    }
+
+    /******************************** operaciones con callbacks ********************************/
+
     public void create(Category c, Runnable success, Runnable fail) {
         //obtiene el id
         if (c.getName().length() > 15 || c.getName().length() < 4) {
@@ -101,20 +117,6 @@ public class CategoryDAO {
         });
     }
 
-    //El objeto category que reciba puede ser diferente en todos los campos menos en el id generado por firebase
-    public void update(Category updated) {
-        if (!categories.contains(updated)) return;
-        ref.child(updated.getId()).setValueAsync(updated);
-    }
-
-    //TODO eliminar también todas las tareas que contenían la categoria eliminada de la base de datos.
-
-    //delete simple
-    public void delete(Category c) {
-        ref.child(c.getId()).removeValueAsync();
-    }
-
-    //delete con callback
     public void delete(Category c, Runnable success) {
         ref.child(c.getId()).removeValue(new DatabaseReference.CompletionListener() {
             @Override
@@ -127,3 +129,5 @@ public class CategoryDAO {
         });
     }
 }
+
+//TODO eliminar también todas las tareas que contenían la categoria eliminada de la base de datos.

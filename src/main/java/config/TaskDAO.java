@@ -9,7 +9,7 @@ import javafx.collections.ObservableList;
 
 import java.time.LocalDate;
 
-public class TaskDAO {
+public class TaskDAO implements DAO <Task>{
 
     private final User logged;
 
@@ -56,12 +56,15 @@ public class TaskDAO {
         });
     }
 
+    /******************************** operaciones CRUD ********************************/
+
+    @Override
     public ObservableList<Task> getAll() {
         //return FXCollections.observableArrayList(tasks); //copia la lista
         return tasks;
     }
 
-    //create simple
+    @Override
     public void create(Task t) {
         if (t.getName().length() > 15 || t.getName().length() < 4 || t.getDescription().length() > 100) {
             System.out.println("No fue posible crear la tarea: " + t.getName() + "(" + t.getUserId() + ")");
@@ -81,6 +84,19 @@ public class TaskDAO {
         //agregar tarea a firebase
         pushed.setValueAsync(t);
     }
+
+    @Override
+    public void update(Task t) {
+        if (!tasks.contains(t)) return;
+        ref.child(t.getId()).setValueAsync(t);
+    }
+
+    @Override
+    public void delete(Task t) {
+        ref.child(t.getId()).removeValueAsync();
+    }
+
+    /******************************** operaciones con callbacks ********************************/
 
     //create con callbacks
     public void create(Task t, Runnable success, Runnable fail) {
@@ -115,17 +131,7 @@ public class TaskDAO {
         });
     }
 
-    public void update(Task t) {
-        if (!tasks.contains(t)) return;
-        ref.child(t.getId()).setValueAsync(t);
-    }
-
-    //delete simple
-    public void delete(Task t) {
-        ref.child(t.getId()).removeValueAsync();
-    }
-
-    //delete async
+    //delete con callbacks
     public void delete(Task t, Runnable success) {
         ref.child(t.getId()).removeValue(new DatabaseReference.CompletionListener() {
             @Override
