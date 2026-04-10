@@ -63,7 +63,7 @@ public class Category {
 
     @Override
     public String toString() {
-        return "Categoria: " + name + " (" + userId + ")";
+        return name; //para el combobox al crear tareas
     }
 
     @Override
@@ -73,6 +73,10 @@ public class Category {
 
         Category c = (Category) o;
 
+        //no se puede comparar una category a la que firebase no le ha asignado un id
+        if (c.getId().isEmpty()) return false;
+
+        //son iguales solo si el id es igual
         return c.getId().equals(this.id);
     }
 }

@@ -33,21 +33,6 @@ public class AuthenticationController {
     @FXML
     public void initialize() {
         userDAO = new UserDAO(); //crea el dao
-
-        //PRUEBA PARA VALIDACIÓN DE USUARIOS
-        /*User u1 = new User("TristanLira", "12345678");  //VALIDO
-        User u2 = new User("TristanLira", "holahola");  //INVALIDO
-        User u3 = new User("usuario3", "password");     //VALIDO
-        User u4 = new User("usuario_4", "password");    //VALIDO
-        User u5 = new User("usuario 5", "password");    //INVALIDO
-        User u6 = new User("u6", "password");           //INVALIDO
-
-        userDAO.create(u1);
-        userDAO.create(u2);
-        userDAO.create(u3);
-        userDAO.create(u4);
-        userDAO.create(u5);
-        userDAO.create(u6);*/
     }
 
     private void cleanFields() {
@@ -56,7 +41,7 @@ public class AuthenticationController {
     }
 
     public void login(ActionEvent actionEvent) {
-        ObservableList<User> users = userDAO.getUsers();
+        ObservableList<User> users = userDAO.getAll();
         User u = getUserFromFields();
 
         System.out.println(u + "\n"); //usuario recuperado
@@ -93,7 +78,7 @@ public class AuthenticationController {
 
         //obtiene el controlador de la vista desde el loader e inicializa los datos del usuario loggeado
         MainController controller = loader.getController();
-        controller.setUser(u, userDAO);
+        controller.InitControllerData(u, userDAO);
 
         //obtiene el stage donde está el botón que creó el evento
         Scene authenticationScene = ((Node) event.getSource()).getScene();

@@ -10,9 +10,6 @@ import java.util.regex.*;
 
 public class UserDAO {
 
-    /*Este DAO no incluye la operación de update, ya que es necesario que las entidades user
-    * no puedan ser modificas debido a que la clave será siempre el usuario que se registró.*/
-
     //regex para validar usuarios y contraseñas
     public static final String USER_PASSWORD_REGEX = "[a-zA-Z0-9_-]*";
     private final Pattern pattern;
@@ -28,7 +25,7 @@ public class UserDAO {
         pattern = Pattern.compile(USER_PASSWORD_REGEX);
     }
 
-    public ObservableList<User> getUsers() {
+    public ObservableList<User> getAll() {
         return FXCollections.observableArrayList(users); //clona la lista
     }
 
@@ -136,6 +133,9 @@ public class UserDAO {
         Matcher matcher = pattern.matcher(u.getPassword());
         return !matcher.matches() || u.getPassword().length() < 8 || u.getPassword().length() > 20;
     }
+
+    //los usuarios son inmutables por lo que no agrega ninguna funcionalidad
+    public void update() {}
 
     public void delete(User u) {
         ref.child(u.getUser()).removeValueAsync();

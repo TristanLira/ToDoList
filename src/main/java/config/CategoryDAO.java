@@ -1,31 +1,25 @@
 package config;
 
-import com.example.todolist.MainController;
 import com.example.todolist.models.Category;
-import com.example.todolist.models.ComboColor;
 import com.example.todolist.models.User;
 import com.google.firebase.database.*;
-import com.google.firebase.database.core.SyncTree;
-import com.google.firebase.database.core.view.Event;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
-import java.util.List;
 
 
 public class CategoryDAO {
 
     //usuario al que se le van a registrar las categorías aquí creadas
-    private final User user;
+    private final User logged;
 
     private final FirebaseDatabase db;
     private final DatabaseReference ref;
 
-    ObservableList<Category> categories;
+    private final ObservableList<Category> categories;
 
-    public CategoryDAO(User user) {
-        this.user = user;
+    public CategoryDAO(User logged) {
+        this.logged = logged;
         db = FirebaseConnection.getDB();
         ref = db.getReference("categories");
         categories = FXCollections.observableArrayList();
@@ -35,7 +29,7 @@ public class CategoryDAO {
     /*suscribir el DAO exclusivamente a los cambios de las categories que tengan el mismo
     * userId (para recuperar los datos de solo la cuenta con la que se inició sesión)*/
     private void subscribe() {
-        ref.orderByChild("userId").equalTo(user.getUser()).addChildEventListener(new ChildEventListener() {
+        ref.orderByChild("userId").equalTo(logged.getUser()).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Category c = dataSnapshot.getValue(Category.class);
@@ -63,14 +57,15 @@ public class CategoryDAO {
         });
     }
 
-    public ObservableList<Category> getCategories() {
-        return FXCollections.observableArrayList(categories); //clona la lista
+    public ObservableList<Category> getAll() {
+        //return FXCollections.observableArrayList(categories); //clona la lista
+        return categories;
     }
 
     //create simple
     public void create(Category c) {
         //obtiene el id
-        if (c.getName().length() > 30 || c.getName().length() < 4) {
+        if (c.getName().length() > 15 || c.getName().length() < 4) {
             System.out.println("No se pudo crear la categoría \"" + c.getName() + "\" (" + c.getUserId() + ")");
             return;
         }
@@ -83,7 +78,7 @@ public class CategoryDAO {
     //create con callbacks, ejecutan una acción si
     public void create(Category c, Runnable success, Runnable fail) {
         //obtiene el id
-        if (c.getName().length() > 30 || c.getName().length() < 4) {
+        if (c.getName().length() > 15 || c.getName().length() < 4) {
             System.out.println("No se pudo crear la categoría \"" + c.getName() + "\" (" + c.getUserId() + ")");
             Platform.runLater(fail);
             return;
