@@ -1,5 +1,6 @@
 package com.example.todolist.models;
 
+import com.google.firebase.database.Exclude;
 import javafx.scene.paint.Color;
 
 public class Category {
@@ -9,6 +10,8 @@ public class Category {
     private String name;
     private String color;
     private Color colorObj;
+
+    private CategoryRow uiRow;
 
     public Category(String userId, String name, Color colorObj) {
         this.userId = userId;
@@ -59,6 +62,18 @@ public class Category {
 
     private void setColorObj() {
         colorObj = Color.web(color);
+    }
+
+    //excluye el row de escribirse o leerse por la base de datos
+
+    @Exclude
+    public void setUiRow(CategoryRow uiRow) {
+        this.uiRow = uiRow;
+    }
+
+    @Exclude
+    public CategoryRow getUiRow() {
+        return uiRow;
     }
 
     @Override

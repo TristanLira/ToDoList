@@ -61,4 +61,8 @@ public class CategoryRow extends GridPane {
     public Button getDeleteButton() {
         return deleteButton;
     }
+
+    public Category getCategory() {
+        return c;
+    }
 }

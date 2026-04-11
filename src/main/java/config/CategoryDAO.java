@@ -156,5 +156,3 @@ public class CategoryDAO implements DAO<Category> {
         });
     }
 }
-
-//TODO eliminar también todas las tareas que contenían la categoria eliminada de la base de datos.

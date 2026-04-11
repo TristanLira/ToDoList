@@ -54,7 +54,6 @@ public class MainController {
 
     //lista de categories
     private ObservableList<Category> categories;
-    private ObservableList<CategoryRow> catRows;
 
     //lista de tareas, según su clasifición
     private ObservableList<Task> tasks; //todas las tareas del usuario
@@ -95,17 +94,20 @@ public class MainController {
         this.taskDAO = new TaskDAO(logged);
 
         //también se inicializan las listas de los models
-        this.categories = FXCollections.observableArrayList();
-        this.categoryFilterComboBox.setItems(categories);
         initTasksLists();
 
+        //inicializar cosillas del menú
         displayUserLabel.setText("Bienvenido, " + logged.getUser() + ".");
+        this.categoryFilterComboBox.setItems(categories);
 
         //inicia la vista principal en la sección de tareas pendientes
         showDueSection();
     }
 
     private void initTasksLists() {
+        this.categories = catDAO.getAll();
+        loadCategories();
+
         this.tasks = taskDAO.getAll();
 
         this.due = taskDAO.getDue();
@@ -120,9 +122,6 @@ public class MainController {
 
 
     /****************************** métodos para filtrar tareas ******************************/
-
-    /*TODO: agregar combo box para seleccionar la categoria para filtrar, modificar filterByCategory y
-       removeAllFilters para que filtren completedSection y overdueSection*/
 
     private void filterByCategory(Category c) {
         applyCategoryFilterToSection(c, dueSection);
@@ -176,9 +175,8 @@ public class MainController {
     public void saveCategory(ActionEvent actionEvent) {
         Category c = getCategoryFromFields();
 
-        /*escribe la entidad en la base de datos, pasando dos metodos. Si la escritura es exitosa, llama a loadCategories,
-        * que recarga las CategoryRows dentro de la GUI, pero si no llama a la alerta para indicar al usuario del error.*/
-        catDAO.create(c, () -> loadCategories(), () -> invalidCategoryNameAlert());
+        /*si no se escribe correctamente llama a la alerta para indicar al usuario del error.*/
+        catDAO.create(c, () -> { System.out.println("Categoria guardada en firebase: " + c); }, () -> invalidCategoryNameAlert());
     }
 
     private Category getCategoryFromFields() {
@@ -196,46 +194,47 @@ public class MainController {
     }
 
     //Carga las categorías a la lista y crea los CategoryRow
-    public void loadCategories() {
-        loadCategoriesList();
+    private void loadCategories() {
+        /*crea un listener que escucha cada que se agrega o elimina una categoria a la lista y actualiza dinámicamente las categoryRows*/
+        categories.addListener((ListChangeListener<Category>) change -> {
+            while (change.next()) {
 
-        //limpia la lista de rows
-        removeRowsFromGUI();
-        catRows = FXCollections.observableArrayList();
+                if (change.wasAdded()) {
 
-        /*los objetos CategoryRow son nodos que extienden de GridPane, muestran una
-        * category dentro de la GUI como una columna de una tabla.*/
-        for (Category i: categories) {
-            CategoryRow cr = new CategoryRow(i);
-            catRows.add(cr);
+                    for (Category i: change.getAddedSubList()) {
+                        Platform.runLater(() -> {
+                            categorySection.getChildren().add(createCatRow(i));
+                        });
+                    }
 
-            //agrega un evento para eliminar tanto Category de la bse de datos como su row
-            cr.getDeleteButton().setOnAction(actionEvent -> {
-                catDAO.delete(i, () -> loadCategories()); //el delete recarga las categorías cargadas para actualizar la lista
-                categorySection.getChildren().remove(cr);
+                } else if (change.wasRemoved()) {
+
+                    for (Category i: change.getRemoved()) {
+                        if (i.getUiRow() != null) {
+                            Platform.runLater(() -> {
+                                categorySection.getChildren().remove(i.getUiRow());
+                            });
+                        }
+                    }
+
+                }
+
+            }
+        });
+
+    }
+
+    private CategoryRow createCatRow(Category c) {
+        CategoryRow cr = new CategoryRow(c);
+        c.setUiRow(cr);
+
+        cr.getDeleteButton().setOnAction(ActionEvent -> {
+            catDAO.delete(cr.getCategory(), () -> {
+                System.out.println("Categoria eliminada permanentemente: " + cr.getCategory());
             });
+        });
 
-            categorySection.getChildren().add(cr);
-        }
-
-        /*System.out.println("Recargando sección de categorías, categorías obtenidas: ");
-        for (Category i: categories) System.out.println(i);
-        System.out.println();*/
-    }
-
-    private void loadCategoriesList() {
-        //limpia las categories obtenidas del dao
-        categories.setAll(catDAO.getAll());
-    }
-
-    private void removeRowsFromGUI() {
-        if (catRows == null) return;
-
-        for (CategoryRow i: catRows) {
-            categorySection.getChildren().remove(i);
-        }
-
-        catRows = null;
+        return cr;
     }
 
     private void initCategoryComboBox() {
@@ -437,7 +436,50 @@ public class MainController {
         t.setUiRow(tr);
 
         //le indica al hilo de javafx que agregue el taskRow
-        Platform.runLater(() -> addTaskRowInOrder(tr, completedSection));
+        //Platform.runLater(() -> addTaskRowInOrder(tr, completedSection));
+        Platform.runLater(() -> addTaskRowInCustomOrder(tr));
+    }
+
+    /*Agrega primero las tareas no vencidas de mas cercana a más lejana
+    * y luego las tareas vencidas de más lejana a más cercana*/
+    private void addTaskRowInCustomOrder(TaskRow tr) {
+        ObservableList<Node> children = completedSection.getChildren();
+
+        LocalDate today = LocalDate.now();
+        boolean isOverdue = tr.getDeadline().isBefore(today);
+
+        for (int i = 0; i < children.size(); i++) {
+            if (!(children.get(i) instanceof TaskRow)) continue;
+
+            TaskRow tr2 = (TaskRow) children.get(i);
+
+            boolean isOverdue2 = tr2.getDeadline().isBefore(today);
+
+            //CASO 1, ambas no vencidas: más cercana primero
+            if (!isOverdue && !isOverdue2) {
+                if (tr.getDeadline().isBefore(tr2.getDeadline())) {
+                    children.add(i, tr);
+                    return;
+                }
+            }
+
+            //CASO 2, ambas vencidas: más reciente primero
+            else if (isOverdue && isOverdue2) {
+                if (tr.getDeadline().isAfter(tr2.getDeadline())) {
+                    children.add(i, tr);
+                    return;
+                }
+            }
+
+            //CASO 3: tr NO vencida y tr2 SÍ vencida: tr va antes
+            else if (!isOverdue && isOverdue2) {
+                children.add(i, tr);
+                return;
+            }
+        }
+
+        // si no encontró posición, va al final
+        children.add(tr);
     }
 
     /****************************** métodos para overdueSection ******************************/
@@ -545,7 +587,6 @@ public class MainController {
 
         cleanCategoryFields();
         initCategoryComboBox();
-        loadCategories();
     }
 
     public void showTaskSection(ActionEvent actionEvent) {
@@ -571,7 +612,6 @@ public class MainController {
 
         cleanTaskFields();
         initTaskCategoryComboBox();
-        loadCategoriesList(); //carga solo la lista y no los CategoryRow
     }
 
     public void showCompletedSection(ActionEvent actionEvent) {
