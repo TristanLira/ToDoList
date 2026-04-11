@@ -6,8 +6,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
-
 <?import org.kordamp.ikonli.javafx.FontIcon?>
+
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.example.todolist.MainController"
@@ -23,6 +23,7 @@
     </rowConstraints>
 
     <!--Menú con los accesos a cada sección-->
+
     <VBox alignment = "TOP_CENTER" styleClass = "section-menu"
           GridPane.rowIndex="0" GridPane.columnIndex="0">
 
@@ -38,7 +39,7 @@
 
         <Label prefHeight="20"/> <!--spacing manual-->
 
-        <Button fx:id = "showTodoSection" onAction = "#showTodoSection" text = " Tareas pendientes"
+        <Button fx:id = "showDueSection" onAction = "#showDueSection" text = " Tareas pendientes"
                 maxWidth="Infinity" styleClass="section-menu-button">
             <graphic>
                 <FontIcon iconLiteral="fas-list" styleClass="icon-section"/>
@@ -59,6 +60,9 @@
             </graphic>
         </Button>
 
+        <Button text = "aplicar filtro" onAction="#filter"/>
+        <Button text = "borrar filtros" onAction="#removeAllFilters"/>
+
     </VBox>
 
     <!-- Este scroll pane envuelve el stack pane que mostrará las diferentes
@@ -67,7 +71,7 @@
     <ScrollPane fx:id = "sectionScrollPane"
                 GridPane.rowIndex="0" GridPane.columnIndex="1"
                 maxWidth="Infinity" maxHeight="Infinity"
-                fitToWidth="true" fitToHeight="true"
+                fitToWidth="true"
                 styleClass="section-space">
 
         <padding>
@@ -77,13 +81,12 @@
         <StackPane maxWidth="Infinity">
 
             <!--todoSection-->
-            <VBox fx:id="todoSection" spacing="20">
+            <VBox fx:id="dueSection" spacing="20">
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
 
                 <Label text = "Tareas pendientes" styleClass="section-title"/>
-                <Button text = "crear" onAction="#loadTasks"/>
             </VBox>
 
             <!--categorySection-->
@@ -145,12 +148,6 @@
                 <Button fx:id = "taskSaveButton" onAction="#saveTask" text = " Guardar">
                     <graphic>
                         <FontIcon iconLiteral="fas-save" styleClass="icon-button"/>
-                    </graphic>
-                </Button>
-
-                <Button fx:id="printTasksButton" onAction="#printTasks">
-                    <graphic>
-                        <FontIcon iconLiteral="fas-print" styleClass="icon-button"/>
                     </graphic>
                 </Button>
             </VBox>

@@ -203,3 +203,86 @@
 .date-picker-popup .day-cell:hover {
     -fx-background-color: #cdeeee;
 }
+
+/*clase TaskRow*/
+
+.task-row {
+    -fx-background-color: #d0eeee;
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+
+    -fx-padding: 10;
+
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 10, 0.25, 0, 3);
+}
+
+/* Grid interno */
+.task-row-grid {
+    -fx-background-color: transparent;
+}
+
+.task-row-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c7a7b;
+}
+
+.task-row-subtitle {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c7a7b;
+}
+
+/* Categoría (IMPORTANTE: no sobreescribir fondo dinámico) */
+.task-category {
+    -fx-font-size: 13px;
+    -fx-text-fill: white;
+
+    -fx-padding: 4 10 4 10;
+    -fx-background-radius: 10;
+
+    -fx-font-weight: bold;
+}
+
+/* Descripción */
+.task-description {
+    -fx-font-size: 14px;
+    -fx-text-fill: #3a6f73;
+}
+
+/* Título "Tiempo restante" */
+.task-time-title {
+    -fx-font-size: 13px;
+    -fx-text-fill: #5f8f92;
+    -fx-font-weight: bold;
+}
+
+/* Tiempo restante */
+.task-time {
+    -fx-font-size: 14px;
+    -fx-text-fill: #3a6f73;
+}
+
+/* Botón completar */
+.task-complete-button {
+    -fx-background-color: #76c7c0;
+    -fx-background-radius: 50;
+
+    -fx-min-width: 40;
+    -fx-min-height: 40;
+
+    -fx-max-width: 40;
+    -fx-max-height: 40;
+
+    -fx-padding: 0;
+}
+
+/* Hover */
+.task-complete-button:hover {
+    -fx-background-color: #5fb3ad;
+}
+
+/* Presionado */
+.task-complete-button:pressed {
+    -fx-background-color: #4aa19b;
+}

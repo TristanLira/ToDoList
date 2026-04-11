@@ -11,7 +11,7 @@ import java.util.regex.*;
 public class UserDAO implements DAO<User> {
 
     //regex para validar usuarios y contraseñas
-    public static final String USER_PASSWORD_REGEX = "[a-zA-Z0-9_-]*";
+    public static final String USER_REGEX = "[a-zA-Z0-9_-]*";
     private final Pattern pattern;
 
     DatabaseReference ref; //referencia a la tabla de usuarios
@@ -22,7 +22,7 @@ public class UserDAO implements DAO<User> {
         users = FXCollections.observableArrayList();
         subscribe();
 
-        pattern = Pattern.compile(USER_PASSWORD_REGEX);
+        pattern = Pattern.compile(USER_REGEX);
     }
 
     //suscribe el dao a los eventos
@@ -104,8 +104,7 @@ public class UserDAO implements DAO<User> {
         return !matcher.matches() || u.getUser().length() < 4 || u.getUser().length() > 15;
     }
     private boolean invalidPassword(User u) {
-        Matcher matcher = pattern.matcher(u.getPassword());
-        return !matcher.matches() || u.getPassword().length() < 8 || u.getPassword().length() > 20;
+        return u.getPassword().length() < 8 || u.getPassword().length() > 20;
     }
 
     /*En esta otra versión del metodo se recibe el controlador específico de donde fue llamada, para poder notificar

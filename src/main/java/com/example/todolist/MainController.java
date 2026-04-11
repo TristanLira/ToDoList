@@ -4,14 +4,18 @@ import com.example.todolist.models.*;
 import config.CategoryDAO;
 import config.TaskDAO;
 import config.UserDAO;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 
 public class MainController {
 
@@ -19,9 +23,9 @@ public class MainController {
     public Label displayUserLabel;
     public ScrollPane sectionScrollPane;
 
-    //todoSection
-    public Button showTodoSection;
-    public VBox todoSection;
+    //dueSection
+    public Button showDueSection;
+    public VBox dueSection;
 
     //categorySection
     public Button showCategorySection;
@@ -38,15 +42,17 @@ public class MainController {
     public DatePicker taskDatePicker;
     public Button taskSaveButton;
     public TextArea taskDescriptionTextArea;
-    public Button printTasksButton;
 
 
     //lista de categories
     private ObservableList<Category> categories;
     private ObservableList<CategoryRow> catRows;
 
-    //lista de tareas
-    private ObservableList<Task> tasks;
+    //lista de tareas, según su clasifición
+    private ObservableList<Task> tasks; //todas las tareas del usuario
+    private ObservableList<Task> completed; //tareas completadas
+    private ObservableList<Task> due; //tareas pendientes
+    private ObservableList<Task> overdue; //tareas vencidas
 
     //DAOs
     UserDAO userDAO;
@@ -68,7 +74,7 @@ public class MainController {
     //llamar cuando se haga el cambio de escena para inicializar lo que el controlador necesita
     public void InitControllerData(User u, UserDAO dao) {
         if (userDAO != null || logged != null) {
-            System.out.println("Usuario o DAO ya asignados");
+            System.out.println("Usuario o DAO ya asignados para mainController");
             return;
         }
 
@@ -82,12 +88,64 @@ public class MainController {
 
         //también se inicializan las listas de los models
         this.categories = FXCollections.observableArrayList();
-        this.tasks = FXCollections.observableArrayList();
+        initTasksLists();
 
         displayUserLabel.setText("Bienvenido, " + logged.getUser() + ".");
 
         //inicia la vista principal en la sección de tareas pendientes
-        showTodoSection();
+        showDueSection();
+    }
+
+    private void initTasksLists() {
+        this.tasks = taskDAO.getAll();
+
+        this.completed = taskDAO.getCompleted();
+
+        this.due = taskDAO.getDue();
+        loadDueTasks();
+
+        this.overdue = taskDAO.getOverdue();
+    }
+
+
+    /****************************** métodos para filtrar tareas ******************************/
+
+    /*TODO: agregar combo box para seleccionar la categoria para filtrar, modificar filterByCategory y
+       removeAllFilters para que filtren completedSection y overdueSection*/
+
+    private void filterByCategory(Category c) {
+        applyCategoryFilterToSection(c, dueSection);
+    }
+
+    public void removeAllFilters() {
+        removeCategoryFilterToSection(dueSection);
+    }
+
+    private void applyCategoryFilterToSection(Category c, VBox section){
+        for (Node i: section.getChildren()) {
+            if (!(i instanceof TaskRow)) continue;
+
+            TaskRow tr = (TaskRow) i;
+            if (!tr.getCategory().equals(c)) {
+                tr.setVisible(false);
+                tr.setManaged(false);
+            }
+        }
+    }
+
+    private void removeCategoryFilterToSection(VBox section){
+        for (Node i: section.getChildren()) {
+            if (!(i instanceof TaskRow)) continue;
+            i.setVisible(true);
+            i.setManaged(true);
+        }
+    }
+
+    /*PRUEBA, ELIMINAR DESPUÉS*/
+    public void filter() {
+        Category c = new Category();
+        c.setId("-OptsB6UfTgiS3GPQqZt");
+        filterByCategory(c);
     }
 
     /****************************** métodos para categorySection ******************************/
@@ -164,12 +222,12 @@ public class MainController {
 
     private void initCategoryComboBox() {
         ObservableList<ComboColor> items = FXCollections.observableArrayList(
-                new ComboColor(Color.web("#FAEDCB"),"Amarillo"),
-                new ComboColor(Color.web("#C9E4DE"), "Verde"),
-                new ComboColor(Color.web("#C6DEF1"), "Azul"),
-                new ComboColor(Color.web("#DBCDF0"), "Morado"),
-                new ComboColor(Color.web("#F2C6DE"), "Rojo"),
-                new ComboColor(Color.web("#F7D9C4"), "Naranja")
+                new ComboColor(Color.web("#FFEE8C"),"Amarillo"),
+                new ComboColor(Color.web("#A9E9A4"), "Verde"),
+                new ComboColor(Color.web("#84B6F4"), "Azul"),
+                new ComboColor(Color.web("#C18FFF"), "Morado"),
+                new ComboColor(Color.web("#F56574"), "Rojo"),
+                new ComboColor(Color.web("#FFAE6A"), "Naranja")
         );
         categoryColorComboBox.setItems(items);
     }
@@ -205,11 +263,10 @@ public class MainController {
         }
 
         //escribir en la base de datos
-        System.out.println(t);
         taskDAO.create(t, new Runnable() {
             @Override
             public void run() {
-                System.out.println("tarea creada: " + t.getName());
+                System.out.println("tarea agregada a firebase exitosamente: " + t.getName() + "\n");
             }
         }, () -> invalidTaskAlert());
     }
@@ -229,13 +286,6 @@ public class MainController {
         return t;
     }
 
-    public void printTasks(ActionEvent actionEvent) {
-        loadTasksList();
-        System.out.println("Tareas de " + logged.getUser());
-        for (Task i: tasks) System.out.println(i);
-        System.out.println();
-    }
-
     public void categoryNotSelectedAlert() {
         Alert a = new Alert(Alert.AlertType.WARNING);
         a.setTitle("Categoría no seleccionada");
@@ -251,47 +301,91 @@ public class MainController {
         a.show();
     }
 
-    /****************************** métodos para todoSection ******************************/
+    /****************************** métodos para dueSection ******************************/
 
-    //carga la lista de tasks y los objetos TasksRow que las representan
-    public void loadTasks() {
-        loadTasksList();
-        Task t = taskDAO.get("-OppNIYx4ogd9YEjnv0Q");
-        Category c = catDAO.get(t.getCategoryId());
-        if (t == null || c == null) return;
-        TaskRow tr = new TaskRow(t,c);
-        todoSection.getChildren().add(tr);
+    /*En el metodo initTasks se inicializa la lista de tareas completadas (que se mostrarán en esta sección) obteniendo una
+    * referencia a la lista original en el dao, y después se llama a este metodo que agrega un Listener para todos los cambios
+    * que reciba la lista. De esta forma, cada que se agreguen nuevas tareas en la lista del dao, este listener crea el el
+    * objeto taskRow que la representa dentro de la GUI, y lo agrega al vbox todoSection*/
+    public void loadDueTasks() {
+        System.out.println("Cargando las tareas a la gui");
+
+        due.addListener((ListChangeListener<Task>) change ->{
+
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Task i: change.getAddedSubList()) {
+                        System.out.println("Nuevo cambio en due: " + i);
+                        createTaskRow(i); //crea un nuevo taskRow con cada tarea agregada
+                    }
+                }
+            }
+
+        });
+
     }
 
-    private void loadTasksList() {
-        tasks.setAll(taskDAO.getAll());
-        System.out.println("Tareas: ");
-        for (Task i: tasks) {
-            System.out.println(i);
+    //crea el taskRow, le agrega los eventos al botón y lo muestra en la GUI
+    private void createTaskRow(Task t) {
+        Category c = catDAO.get(t.getCategoryId());
+
+        if (t == null || c == null) {
+            return;
         }
-        System.out.println();
+
+        TaskRow tr = new TaskRow(t, c);
+
+        //le indica al hilo de javafx que agregue el taskRow
+        Platform.runLater(() -> addTaskRowInOrder(tr, dueSection));
+        //Platform.runLater(() -> dueSection.getChildren().add(tr));
+    }
+
+    //inserta la taskRow según la fecha
+    private void addTaskRowInOrder(TaskRow tr, VBox section) {
+        ObservableList<Node> children = section.getChildren();
+
+        for (int i = 0; i < children.size(); i++) {
+            if (!(children.get(i) instanceof TaskRow)) continue;
+
+            TaskRow tr2 = (TaskRow) children.get(i);
+
+            if (tr.getDeadline().isBefore(tr2.getDeadline())) {
+                children.add(i, tr);
+                return;
+            }
+        }
+        //si no encuentra ninguna tarea con fecha mejor la agrega al final
+        children.add(tr);
     }
 
     /****************************** métodos para mostrar cada sección ******************************/
 
-    public void showTodoSection() {
-        todoSection.toFront();
-        todoSection.setVisible(true);
+    public void showDueSection() {
+        //mostrar todoSection
+        dueSection.setVisible(true);
+        dueSection.setManaged(true);
+
+        //ocultar las demás
 
         categorySection.setVisible(false);
+        categorySection.setManaged(false);
+
         taskSection.setVisible(false);
-
-        //-------------------------------
-
-        loadTasksList();
+        taskSection.setManaged(false);
     }
 
     public void showCategorySection(ActionEvent actionEvent) {
-        categorySection.toFront();
+        //mostrar categorySection
         categorySection.setVisible(true);
+        categorySection.setManaged(true);
 
-        todoSection.setVisible(false);
+        //ocultar las demás
+
+        dueSection.setVisible(false);
+        dueSection.setManaged(false);
+
         taskSection.setVisible(false);
+        taskSection.setManaged(false);
 
         //-------------------------------
 
@@ -301,18 +395,23 @@ public class MainController {
     }
 
     public void showTaskSection(ActionEvent actionEvent) {
-        taskSection.toFront();
+        //mostrar taskSection
         taskSection.setVisible(true);
+        taskSection.setManaged(true);
 
-        todoSection.setVisible(false);
+        //ocultar las demás
+
+        dueSection.setVisible(false);
+        dueSection.setManaged(false);
+
         categorySection.setVisible(false);
+        categorySection.setManaged(false);
 
         //-------------------------------
 
         cleanTaskFields();
         initTaskCategoryComboBox();
         loadCategoriesList(); //carga solo la lista y no los CategoryRow
-        loadTasksList();
     }
 }
 

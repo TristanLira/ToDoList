@@ -16,7 +16,12 @@ public class TaskDAO implements DAO <Task>{
     private final FirebaseDatabase db;
     private final DatabaseReference ref;
 
-    private final ObservableList<Task> tasks;
+    private final ObservableList<Task> tasks; //todas las tareas
+
+    //listas para clasificar las tareas
+    private final ObservableList<Task> completed;
+    private final ObservableList<Task> due;
+    private final ObservableList<Task> overdue;
 
     public TaskDAO(User logged) {
         db = FirebaseConnection.getDB();
@@ -24,15 +29,35 @@ public class TaskDAO implements DAO <Task>{
         this.logged = logged;
 
         tasks = FXCollections.observableArrayList();
+        completed = FXCollections.observableArrayList();
+        due = FXCollections.observableArrayList();
+        overdue = FXCollections.observableArrayList();
         subscribe();
     }
 
     private void subscribe() {
+        //suscribe el dao a los cambios de todas las tareas pertenecientes al usuario
         ref.orderByChild("userId").equalTo(logged.getUser()).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot snapshot, String previousChildName) {
                 Task t = snapshot.getValue(Task.class);
                 tasks.add(t);
+
+                //System.out.println(t);
+
+                //después de agregar la tarea a la lista la clasifica
+                if (t.isCompleted()) {
+                    completed.add(t);
+                }
+                //si la fecha de vencimiento aún no pasa la clasifica como pendiente
+                else if(t.obtainDeadlineObj().isAfter(LocalDate.now()) ||
+                        t.obtainDeadlineObj().isEqual(LocalDate.now())) {
+                    due.add(t);
+                }
+                //si no ninguna de las dos la clasifica como vencida
+                else {
+                    overdue.add(t);
+                }
             }
 
             @Override
@@ -56,6 +81,14 @@ public class TaskDAO implements DAO <Task>{
         });
     }
 
+    /******************************** operaciones CRUD ********************************/
+
+    @Override
+    public ObservableList<Task> getAll() {
+        //return FXCollections.observableArrayList(tasks); //copia la lista
+        return tasks;
+    }
+
     public Task get(String id) {
         for (Task i: tasks) {
             if (i.getId().equals(id)) {
@@ -63,14 +96,6 @@ public class TaskDAO implements DAO <Task>{
             }
         }
         return null;
-    }
-
-    /******************************** operaciones CRUD ********************************/
-
-    @Override
-    public ObservableList<Task> getAll() {
-        //return FXCollections.observableArrayList(tasks); //copia la lista
-        return tasks;
     }
 
     @Override
@@ -96,7 +121,10 @@ public class TaskDAO implements DAO <Task>{
 
     @Override
     public void update(Task t) {
-        if (!tasks.contains(t)) return;
+        if (!tasks.contains(t)){
+            System.out.println("No se puede actualizar la tarea \"" + t.getName() + "\" porque no existe en firebase.");
+            return;
+        }
         ref.child(t.getId()).setValueAsync(t);
     }
 
@@ -131,7 +159,7 @@ public class TaskDAO implements DAO <Task>{
             @Override
             public void onComplete(DatabaseError error, DatabaseReference ref) {
                 if (error == null) {
-                    System.out.println("Tarea \"" + t.getName() + "\" agregada correctamente.");
+                    System.out.println("Tarea \"" + t.getName() + "\" agregada correctamente a firebase.");
                     Platform.runLater(success);
                 } else {
                     System.out.println("Error al crear la tarea: " + t.getName() + "(" + t.getUserId() + ")");
@@ -151,5 +179,19 @@ public class TaskDAO implements DAO <Task>{
                 }
             }
         });
+    }
+
+    /******************************** consultas específicas ********************************/
+
+    public ObservableList<Task> getCompleted() {
+        return completed;
+    }
+
+    public ObservableList<Task> getDue() {
+        return due;
+    }
+
+    public ObservableList<Task> getOverdue() {
+        return overdue;
     }
 }

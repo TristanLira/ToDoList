@@ -17,6 +17,8 @@ public class Task {
     private LocalDate creationObj;
     private LocalDate deadlineObj;
 
+    private boolean completed;
+
     public Task(String userId, String categoryId, String name, String description, LocalDate deadlineObj) {
         this.userId = userId;
         this.categoryId = categoryId;
@@ -28,6 +30,8 @@ public class Task {
         //asigna la fecha actual como la fecha de creación
         this.creationObj = LocalDate.now();
         this.creation = creationObj.toString();
+
+        completed = false;
     }
 
     public Task() {}
@@ -98,6 +102,14 @@ public class Task {
         this.deadlineObj = LocalDate.parse(deadline);
     }
 
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
@@ -114,6 +126,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Tarea: " + name + ", creación: " + creation + ", limite: " + deadline;
+        return "Tarea: " + name + ", creacion: " + creation + ", limite: " + deadline +
+                (completed ? "(completada)" : "");
     }
 }
