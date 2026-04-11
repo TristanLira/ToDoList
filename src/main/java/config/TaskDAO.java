@@ -43,37 +43,29 @@ public class TaskDAO implements DAO <Task>{
                 Task t = snapshot.getValue(Task.class);
                 tasks.add(t);
 
-                //System.out.println(t);
-
-                //después de agregar la tarea a la lista la clasifica
-                if (t.isCompleted()) {
-                    completed.add(t);
-                }
-                //si la fecha de vencimiento aún no pasa la clasifica como pendiente
-                else if(t.obtainDeadlineObj().isAfter(LocalDate.now()) ||
-                        t.obtainDeadlineObj().isEqual(LocalDate.now())) {
-                    due.add(t);
-                }
-                //si no ninguna de las dos la clasifica como vencida
-                else {
-                    overdue.add(t);
-                }
+                updateTasksLists(t);
             }
 
             @Override
             public void onChildChanged(DataSnapshot snapshot, String previousChildName) {
                 Task t = snapshot.getValue(Task.class);
 
-                /*remove busca el elemento a eliminar con el metodo equals, por lo que al pasarle el objeto recuperado
+                /*remove busca el elemento a eliminar con equals, por lo que al pasarle el objeto recuperado
                 * elimina de la lista el elemento con el mismo id, sin importar ningún otro parámetro*/
                 tasks.remove(t);
                 tasks.add(t);
+
+                updateTasksLists(t);
             }
 
             @Override
             public void onChildRemoved(DataSnapshot snapshot) {
                 Task t = snapshot.getValue(Task.class);
                 tasks.remove(t);
+                due.remove(t);
+                overdue.remove(t);
+                completed.remove(t);
+                System.out.println("DAO: tarea permanentemente borrada: " + t);
             }
 
             @Override public void onChildMoved(DataSnapshot snapshot, String previousChildName) {}
@@ -81,7 +73,40 @@ public class TaskDAO implements DAO <Task>{
         });
     }
 
+    //actualiza las listas due, overdue y completed, para categorizar todas las tareas recibidas de firebase
+    private void updateTasksLists(Task t) {
+        due.remove(t);
+        overdue.remove(t);
+        completed.remove(t);
+
+        System.out.println("DAO: " + t);
+
+        //después de agregar la tarea a la lista la clasifica
+        if (t.isCompleted()) {
+            completed.add(t);
+            System.out.println("completed");
+        }
+        //si la fecha de vencimiento aún no pasa la clasifica como pendiente
+        else if(t.obtainDeadlineObj().isAfter(LocalDate.now()) ||
+                t.obtainDeadlineObj().isEqual(LocalDate.now())) {
+            due.add(t);
+            System.out.println("due");
+        }
+        //si no ninguna de las dos la clasifica como vencida
+        else {
+            overdue.add(t);
+        }
+    }
+
     /******************************** operaciones CRUD ********************************/
+
+    @Override
+    public Task get(String id) {
+        for (Task i: tasks) {
+            if (i.getId().equals(id))  return i;
+        }
+        return null;
+    }
 
     @Override
     public ObservableList<Task> getAll() {
@@ -89,18 +114,9 @@ public class TaskDAO implements DAO <Task>{
         return tasks;
     }
 
-    public Task get(String id) {
-        for (Task i: tasks) {
-            if (i.getId().equals(id)) {
-                return i;
-            }
-        }
-        return null;
-    }
-
     @Override
     public void create(Task t) {
-        if (t.getName().length() > 15 || t.getName().length() < 4 || t.getDescription().length() > 100) {
+        if (t.getName().length() > 30 || t.getName().isEmpty() || t.getDescription().length() > 200) {
             System.out.println("No fue posible crear la tarea: " + t.getName() + "(" + t.getUserId() + ")");
             return;
         }
@@ -137,8 +153,8 @@ public class TaskDAO implements DAO <Task>{
 
     //create con callbacks
     public void create(Task t, Runnable success, Runnable fail) {
-        if (t.getName().length() > 15 || t.getName().length() < 4 || t.getDescription().length() > 100) {
-            System.out.println("No fue posible crear la tarea: " + t.getName() + " (" + t.getUserId() + ")");
+        if (t.getName().length() > 30 || t.getName().isEmpty() || t.getDescription().length() > 200) {
+            System.out.println("No fue posible crear la tarea: " + t.getName() + "(" + t.getUserId() + ")");
             Platform.runLater(fail);
             return;
         }

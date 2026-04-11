@@ -14,4 +14,5 @@ public interface DAO<T> {
 
     void delete(T t);
 
+    T get(String id);
 }

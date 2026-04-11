@@ -1,6 +1,7 @@
 package config;
 
 import com.example.todolist.models.Category;
+import com.example.todolist.models.Task;
 import com.example.todolist.models.User;
 import com.google.firebase.database.*;
 import javafx.application.Platform;
@@ -50,6 +51,7 @@ public class CategoryDAO implements DAO<Category> {
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Category c = dataSnapshot.getValue(Category.class);
                 categories.remove(c);
+                deleteAssociatedTasks(c.getId());
             }
 
             @Override public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
@@ -57,14 +59,15 @@ public class CategoryDAO implements DAO<Category> {
         });
     }
 
+    /******************************** operaciones CRUD ********************************/
+
+    @Override
     public Category get(String id) {
         for (Category i: categories) {
             if (i.getId().equals(id)) return i;
         }
         return null;
     }
-
-    /******************************** operaciones CRUD ********************************/
 
     @Override
     public ObservableList<Category> getAll() {
@@ -133,6 +136,23 @@ public class CategoryDAO implements DAO<Category> {
                     Platform.runLater(success);
                 }
             }
+        });
+    }
+
+    private void deleteAssociatedTasks(String id) {
+        db.getReference("tasks")
+                .orderByChild("categoryId")
+                .equalTo(id)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot child: snapshot.getChildren()) {
+                    Task t = child.getValue(Task.class);
+                    db.getReference("tasks").child(t.getId()).removeValueAsync();
+                }
+            }
+
+            @Override public void onCancelled(DatabaseError error) {}
         });
     }
 }

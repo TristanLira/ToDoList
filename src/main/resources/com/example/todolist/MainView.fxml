@@ -24,7 +24,7 @@
 
     <!--Menú con los accesos a cada sección-->
 
-    <VBox alignment = "TOP_CENTER" styleClass = "section-menu"
+    <VBox alignment = "TOP_CENTER" spacing = "25" styleClass = "section-menu"
           GridPane.rowIndex="0" GridPane.columnIndex="0">
 
         <padding>
@@ -33,32 +33,44 @@
 
         <Label text = "To Do List" styleClass="section-title"/>
 
-        <Label prefHeight="20"/> <!--spacing manual-->
-
         <Label fx:id = "displayUserLabel" styleClass = "medium-text"/>
 
-        <Label prefHeight="20"/> <!--spacing manual-->
+        <VBox>
+            <Button fx:id = "showDueSection" onAction = "#showDueSection" text = " Tareas pendientes"
+                    maxWidth="Infinity" styleClass="section-menu-button">
+                <graphic>
+                    <FontIcon iconLiteral="fas-list" styleClass="icon-section"/>
+                </graphic>
+            </Button>
 
-        <Button fx:id = "showDueSection" onAction = "#showDueSection" text = " Tareas pendientes"
-                maxWidth="Infinity" styleClass="section-menu-button">
-            <graphic>
-                <FontIcon iconLiteral="fas-list" styleClass="icon-section"/>
-            </graphic>
-        </Button>
+            <Button fx:id = "showCompletedSection" onAction = "#showCompletedSection" text = " Tareas completadas"
+                    maxWidth="Infinity" styleClass="section-menu-button">
+                <graphic>
+                    <FontIcon iconLiteral="fas-tasks" styleClass="icon-section"/>
+                </graphic>
+            </Button>
 
-        <Button fx:id = "showTaskSection" onAction = "#showTaskSection" text = " Registrar tarea"
-                maxWidth="Infinity" styleClass="section-menu-button">
-            <graphic>
-                <FontIcon iconLiteral="fas-sticky-note" styleClass="icon-section"/>
-            </graphic>
-        </Button>
+            <Button fx:id = "showOverdueSection" onAction = "#showOverdueSection" text = " Tareas vencidas"
+                    maxWidth="Infinity" styleClass="section-menu-button">
+                <graphic>
+                    <FontIcon iconLiteral="fas-times" styleClass="icon-section" />
+                </graphic>
+            </Button>
 
-        <Button fx:id = "showCategorySection" onAction = "#showCategorySection" text = " Registrar categoria"
-                maxWidth="Infinity" styleClass="section-menu-button">
-            <graphic>
-                <FontIcon iconLiteral="fas-edit" styleClass="icon-section"/>
-            </graphic>
-        </Button>
+            <Button fx:id = "showTaskSection" onAction = "#showTaskSection" text = " Registrar tarea"
+                    maxWidth="Infinity" styleClass="section-menu-button">
+                <graphic>
+                    <FontIcon iconLiteral="fas-sticky-note" styleClass="icon-section"/>
+                </graphic>
+            </Button>
+
+            <Button fx:id = "showCategorySection" onAction = "#showCategorySection" text = " Registrar categoria"
+                    maxWidth="Infinity" styleClass="section-menu-button">
+                <graphic>
+                    <FontIcon iconLiteral="fas-edit" styleClass="icon-section"/>
+                </graphic>
+            </Button>
+        </VBox>
 
         <Button text = "aplicar filtro" onAction="#filter"/>
         <Button text = "borrar filtros" onAction="#removeAllFilters"/>
@@ -80,7 +92,7 @@
 
         <StackPane maxWidth="Infinity">
 
-            <!--todoSection-->
+            <!--dueSection-->
             <VBox fx:id="dueSection" spacing="20">
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
@@ -89,32 +101,22 @@
                 <Label text = "Tareas pendientes" styleClass="section-title"/>
             </VBox>
 
-            <!--categorySection-->
-            <VBox fx:id="categorySection" spacing="20">
+            <!--completedSection-->
+            <VBox fx:id="completedSection" spacing="20">
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>
 
-                <VBox alignment="CENTER" spacing="25" fillWidth="false">
-                    <Label text = "Registrar categoría" styleClass="section-title"/>
-                    <GridPane alignment="CENTER" hgap = "10" vgap="10" styleClass="grid-card">
-                        <padding>
-                            <Insets top="20" right="20" bottom="20" left="20"/>
-                        </padding>
-                        <Label alignment="CENTER_RIGHT" text = "nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="medium-text"/>
-                        <Label alignment="CENTER_RIGHT" text = "color:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="medium-text"/>
-                        <TextField fx:id = "categoryNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                        <ComboBox fx:id = "categoryColorComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
-                    </GridPane>
+                <Label text = "Tareas completadas" styleClass="section-title"/>
+            </VBox>
 
-                    <Button fx:id = "categorySaveButton" onAction="#saveCategory" text = " Guardar">
-                        <graphic>
-                            <FontIcon iconLiteral="fas-save" styleClass="icon-button"/>
-                        </graphic>
-                    </Button>
-                </VBox>
+            <!--overdueSection-->
+            <VBox fx:id="overdueSection" spacing="20">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
 
-                <Label text = "Tus categorías" styleClass = "section-subtitle"/>
+                <Label text = "Tareas vencidas" styleClass="section-title"/>
             </VBox>
 
             <!--taskSection-->
@@ -150,6 +152,34 @@
                         <FontIcon iconLiteral="fas-save" styleClass="icon-button"/>
                     </graphic>
                 </Button>
+            </VBox>
+
+            <!--categorySection-->
+            <VBox fx:id="categorySection" spacing="20">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+
+                <VBox alignment="CENTER" spacing="25" fillWidth="false">
+                    <Label text = "Registrar categoría" styleClass="section-title"/>
+                    <GridPane alignment="CENTER" hgap = "10" vgap="10" styleClass="grid-card">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <Label alignment="CENTER_RIGHT" text = "nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="medium-text"/>
+                        <Label alignment="CENTER_RIGHT" text = "color:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="medium-text"/>
+                        <TextField fx:id = "categoryNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                        <ComboBox fx:id = "categoryColorComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
+                    </GridPane>
+
+                    <Button fx:id = "categorySaveButton" onAction="#saveCategory" text = " Guardar">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-save" styleClass="icon-button"/>
+                        </graphic>
+                    </Button>
+                </VBox>
+
+                <Label text = "Tus categorías" styleClass = "section-subtitle"/>
             </VBox>
 
         </StackPane>

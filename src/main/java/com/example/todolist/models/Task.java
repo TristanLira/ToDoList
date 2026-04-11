@@ -1,7 +1,6 @@
 package com.example.todolist.models;
 
-import com.ctc.wstx.util.StringUtil;
-import io.opentelemetry.api.internal.StringUtils;
+import com.google.firebase.database.Exclude;
 
 import java.time.LocalDate;
 
@@ -19,6 +18,8 @@ public class Task {
 
     private boolean completed;
 
+    private TaskRow uiRow;
+
     public Task(String userId, String categoryId, String name, String description, LocalDate deadlineObj) {
         this.userId = userId;
         this.categoryId = categoryId;
@@ -32,14 +33,18 @@ public class Task {
         this.creation = creationObj.toString();
 
         completed = false;
+
+        uiRow = null;
     }
 
     public Task() {}
 
+    @Exclude
     public LocalDate obtainCreationObj() {
         return creationObj;
     }
 
+    @Exclude
     public LocalDate obtainDeadlineObj() {
         return deadlineObj;
     }
@@ -108,6 +113,18 @@ public class Task {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+
+    //Excluye estos getters de la base de datos
+
+    @Exclude
+    public TaskRow getUiRow() {
+        return uiRow;
+    }
+
+    @Exclude
+    public void setUiRow(TaskRow uiRow) {
+        this.uiRow = uiRow;
     }
 
     @Override

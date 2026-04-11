@@ -51,6 +51,14 @@ public class UserDAO implements DAO<User> {
     /******************************** operaciones CRUD ********************************/
 
     @Override
+    public User get(String id) {
+        for (User i: users) {
+            if (i.getUser().equals(id)) return i;
+        }
+        return null;
+    }
+
+    @Override
     public ObservableList<User> getAll() {
         //return FXCollections.observableArrayList(users); //clona la lista
         return users;

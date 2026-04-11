@@ -15,7 +15,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 
 public class MainController {
 
@@ -42,6 +41,14 @@ public class MainController {
     public DatePicker taskDatePicker;
     public Button taskSaveButton;
     public TextArea taskDescriptionTextArea;
+
+    //completedSection
+    public Button showCompletedSection;
+    public VBox completedSection;
+
+    //overdueSection
+    public VBox overdueSection;
+    public Button showOverdueSection;
 
 
     //lista de categories
@@ -99,12 +106,14 @@ public class MainController {
     private void initTasksLists() {
         this.tasks = taskDAO.getAll();
 
-        this.completed = taskDAO.getCompleted();
-
         this.due = taskDAO.getDue();
         loadDueTasks();
 
+        this.completed = taskDAO.getCompleted();
+        loadCompletedTasks();
+
         this.overdue = taskDAO.getOverdue();
+        loadOverdueTasks();
     }
 
 
@@ -115,10 +124,18 @@ public class MainController {
 
     private void filterByCategory(Category c) {
         applyCategoryFilterToSection(c, dueSection);
+        applyCategoryFilterToSection(c, completedSection);
+        applyCategoryFilterToSection(c, overdueSection);
     }
 
     public void removeAllFilters() {
         removeCategoryFilterToSection(dueSection);
+        removeCategoryFilterToSection(completedSection);
+        removeCategoryFilterToSection(overdueSection);
+
+        System.out.println("Overdue:");
+        for (Task i: overdue) System.out.println(i);
+        System.out.println();
     }
 
     private void applyCategoryFilterToSection(Category c, VBox section){
@@ -296,8 +313,8 @@ public class MainController {
     private void invalidTaskAlert() {
         Alert a = new Alert(Alert.AlertType.WARNING);
         a.setTitle("Tarea no crea");
-        a.setContentText("No fue posible crear la tarea, asegúrese que el nombre tenga entre 4 y" +
-                "20 carácteres y la descripción menos de 100 carácteres, y que la fecha aún no haya pasado.");
+        a.setContentText("No fue posible crear la tarea, asegúrese que el nombre tenga entre uno y " +
+                "30 carácteres y la descripción menos de 200 carácteres, y que la fecha aún no haya pasado.");
         a.show();
     }
 
@@ -308,21 +325,35 @@ public class MainController {
     * que reciba la lista. De esta forma, cada que se agreguen nuevas tareas en la lista del dao, este listener crea el el
     * objeto taskRow que la representa dentro de la GUI, y lo agrega al vbox todoSection*/
     public void loadDueTasks() {
-        System.out.println("Cargando las tareas a la gui");
+        System.out.println("Cargando las tareas pendientes a la gui");
 
         due.addListener((ListChangeListener<Task>) change ->{
 
             while (change.next()) {
+                /*este listener se encarga de agregar el taskRow, pero el evento del botón del taskRow se encargará
+                de eliminarlo de la sección en el momento que se presione*/
                 if (change.wasAdded()) {
                     for (Task i: change.getAddedSubList()) {
-                        System.out.println("Nuevo cambio en due: " + i);
+                        System.out.println("Nueva tarea en due: " + i);
                         createTaskRow(i); //crea un nuevo taskRow con cada tarea agregada
+                    }
+                } else if (change.wasRemoved()) {
+                    for (Task i: change.getRemoved()) {
+                        deleteRowFromSection(i, dueSection);
+                        System.out.println("Tarea eliminada de due: " + i);
                     }
                 }
             }
 
         });
 
+    }
+
+    private void deleteRowFromSection(Task t, VBox section) {
+        if (t.getUiRow() == null) return;
+        Platform.runLater(() -> {
+            section.getChildren().remove(t.getUiRow());
+        });
     }
 
     //crea el taskRow, le agrega los eventos al botón y lo muestra en la GUI
@@ -334,10 +365,17 @@ public class MainController {
         }
 
         TaskRow tr = new TaskRow(t, c);
+        t.setUiRow(tr); //le asigna al model su representación en la gui
+
+        //agrega el evento al botón para actualizar la tarea y marcarla como completada
+        tr.getCompleteButton().setOnAction(ActionEvent -> {
+            tr.getTask().setCompleted(true);
+            taskDAO.update(tr.getTask());
+            dueSection.getChildren().remove(tr); //elimina el row
+        });
 
         //le indica al hilo de javafx que agregue el taskRow
         Platform.runLater(() -> addTaskRowInOrder(tr, dueSection));
-        //Platform.runLater(() -> dueSection.getChildren().add(tr));
     }
 
     //inserta la taskRow según la fecha
@@ -358,6 +396,109 @@ public class MainController {
         children.add(tr);
     }
 
+    /****************************** métodos para completedSection ******************************/
+
+    /*Funciona de la misma manera que loadDueTasks, escuchando los cambios a la lista y cargando los objetos
+    * taskRow a la sección de completedSection*/
+    public void loadCompletedTasks() {
+        System.out.println("Cargando las tareas completadas a la gui");
+
+        completed.addListener((ListChangeListener<Task>) change ->{
+
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Task i: change.getAddedSubList()) {
+                        System.out.println("Nueva tarea en completed: " + i);
+                        createDisabledTaskRow(i); //crea un nuevo taskRow con cada tarea agregada
+                    }
+                } else if (change.wasRemoved()) {
+                    for (Task i: change.getRemoved()) {
+                        deleteRowFromSection(i, completedSection);
+                        System.out.println("Tarea eliminada de completed: " + i);
+                    }
+                }
+            }
+
+        });
+
+    }
+
+    //crea un taskRow con la opción de marcar como completada desactivada y lo agrega a la sección recibida
+    private void createDisabledTaskRow(Task t) {
+        Category c = catDAO.get(t.getCategoryId());
+
+        if (t == null || c == null) {
+            return;
+        }
+
+        TaskRow tr = new TaskRow(t, c);
+        tr.disableCompletion(); //desactiva el marcar como completada
+        t.setUiRow(tr);
+
+        //le indica al hilo de javafx que agregue el taskRow
+        Platform.runLater(() -> addTaskRowInOrder(tr, completedSection));
+    }
+
+    /****************************** métodos para overdueSection ******************************/
+
+    /*Funciona igual que las dos secciones anteriores*/
+    public void loadOverdueTasks() {
+        System.out.println("Cargando las tareas vencidas a la gui");
+
+        overdue.addListener((ListChangeListener<Task>) change ->{
+
+            while (change.next()) {
+                if (change.wasAdded()) {
+                    for (Task i: change.getAddedSubList()) {
+                        System.out.println("Nuevo cambio en overdue: " + i);
+                        createOverdueTaskRow(i); //crea un nuevo taskRow con cada tarea agregada
+                    }
+                } else if (change.wasRemoved()) {
+                    for (Task i: change.getRemoved()) {
+                        deleteRowFromSection(i, overdueSection);
+                        System.out.println("Tarea eliminada de completed: " + i);
+                    }
+                }
+            }
+
+        });
+
+    }
+
+    //crea un taskRow con la opción de marcar como completada desactivada y lo agrega a la sección recibida
+    private void createOverdueTaskRow(Task t) {
+        Category c = catDAO.get(t.getCategoryId());
+
+        if (t == null || c == null) {
+            return;
+        }
+
+        TaskRow tr = new TaskRow(t, c);
+        tr.disableCompletion(); //desactiva el marcar como completada
+        tr.highlightOverdue();
+        t.setUiRow(tr);
+
+        //le indica al hilo de javafx que agregue el taskRow
+        Platform.runLater(() -> addTaskRowInInvertedOrder(tr, overdueSection));
+    }
+
+    //inserta la taskRow por fecha, de manera invertida si la fecha ya pasó, y de manera normal si aún no pasa
+    private void addTaskRowInInvertedOrder(TaskRow tr, VBox section) {
+        ObservableList<Node> children = section.getChildren();
+
+        for (int i = 0; i < children.size(); i++) {
+            if (!(children.get(i) instanceof TaskRow)) continue;
+
+            TaskRow tr2 = (TaskRow) children.get(i);
+
+            if (tr.getDeadline().isAfter(tr2.getDeadline())) {
+                children.add(i, tr);
+                return;
+            }
+        }
+        children.add(tr);
+    }
+
     /****************************** métodos para mostrar cada sección ******************************/
 
     public void showDueSection() {
@@ -372,6 +513,12 @@ public class MainController {
 
         taskSection.setVisible(false);
         taskSection.setManaged(false);
+
+        completedSection.setVisible(false);
+        completedSection.setManaged(false);
+
+        overdueSection.setVisible(false);
+        overdueSection.setManaged(false);
     }
 
     public void showCategorySection(ActionEvent actionEvent) {
@@ -386,6 +533,12 @@ public class MainController {
 
         taskSection.setVisible(false);
         taskSection.setManaged(false);
+
+        completedSection.setVisible(false);
+        completedSection.setManaged(false);
+
+        overdueSection.setVisible(false);
+        overdueSection.setManaged(false);
 
         //-------------------------------
 
@@ -407,11 +560,55 @@ public class MainController {
         categorySection.setVisible(false);
         categorySection.setManaged(false);
 
+        completedSection.setVisible(false);
+        completedSection.setManaged(false);
+
+        overdueSection.setVisible(false);
+        overdueSection.setManaged(false);
+
         //-------------------------------
 
         cleanTaskFields();
         initTaskCategoryComboBox();
         loadCategoriesList(); //carga solo la lista y no los CategoryRow
+    }
+
+    public void showCompletedSection(ActionEvent actionEvent) {
+        completedSection.setVisible(true);
+        completedSection.setManaged(true);
+
+        //ocultar las demás
+
+        dueSection.setVisible(false);
+        dueSection.setManaged(false);
+
+        categorySection.setVisible(false);
+        categorySection.setManaged(false);
+
+        taskSection.setVisible(false);
+        taskSection.setManaged(false);
+
+        overdueSection.setVisible(false);
+        overdueSection.setManaged(false);
+    }
+
+    public void showOverdueSection(ActionEvent actionEvent) {
+        overdueSection.setVisible(true);
+        overdueSection.setManaged(true);
+
+        //ocultar las demás
+
+        dueSection.setVisible(false);
+        dueSection.setManaged(false);
+
+        categorySection.setVisible(false);
+        categorySection.setManaged(false);
+
+        taskSection.setVisible(false);
+        taskSection.setManaged(false);
+
+        completedSection.setVisible(false);
+        completedSection.setManaged(false);
     }
 }
 

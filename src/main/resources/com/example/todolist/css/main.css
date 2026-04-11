@@ -227,6 +227,14 @@
     -fx-text-fill: #2c7a7b;
 }
 
+.task-overdue {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    /*-fx-text-fill: #ff0000;*/
+    -fx-text-fill: #ee6b6e;
+}
+
+
 .task-row-subtitle {
     -fx-font-size: 15px;
     -fx-font-weight: bold;

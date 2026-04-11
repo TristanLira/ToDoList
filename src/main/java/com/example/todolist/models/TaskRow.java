@@ -1,6 +1,5 @@
 package com.example.todolist.models;
 
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
@@ -10,7 +9,6 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import javax.swing.*;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
@@ -27,7 +25,7 @@ public class TaskRow extends HBox {
     private final Label timeLeftTitleLabel;
     private final Label timeLeftLabel;
 
-    private final Button completeButton;
+    private Button completeButton;
     private final FontIcon buttonIcon;
 
     private final GridPane grid;
@@ -154,5 +152,17 @@ public class TaskRow extends HBox {
 
     public LocalDate getDeadline() {
         return t.obtainDeadlineObj();
+    }
+
+    //desactiva la opción para marcar la tarea como completada
+    public void disableCompletion() {
+        this.getChildren().remove(completeButton);
+        completeButton = null;
+        timeLeftTitleLabel.setText("Fecha de vencimiento");
+        timeLeftLabel.setText(t.getDeadline());
+    }
+
+    public void highlightOverdue() {
+        nameLabel.getStyleClass().add("task-overdue");
     }
 }
