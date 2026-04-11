@@ -12,7 +12,7 @@
 <?import javafx.scene.control.TextField?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.todolist.AuthenticationController"
-      stylesheets="@css/authentication.css"
+      stylesheets="@css/authentication2.css"
       alignment="CENTER"
       spacing="30">
 

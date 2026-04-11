@@ -27,12 +27,13 @@ public class MainController {
     public Button showDueSection;
     public VBox dueSection;
 
-    //categorySection
-    public Button showCategorySection;
-    public VBox categorySection;
-    public TextField categoryNameField;
-    public ComboBox <ComboColor> categoryColorComboBox;
-    public Button categorySaveButton;
+    //completedSection
+    public Button showCompletedSection;
+    public VBox completedSection;
+
+    //overdueSection
+    public VBox overdueSection;
+    public Button showOverdueSection;
 
     //taskSection
     public Button showTaskSection;
@@ -43,13 +44,12 @@ public class MainController {
     public Button taskSaveButton;
     public TextArea taskDescriptionTextArea;
 
-    //completedSection
-    public Button showCompletedSection;
-    public VBox completedSection;
-
-    //overdueSection
-    public VBox overdueSection;
-    public Button showOverdueSection;
+    //categorySection
+    public Button showCategorySection;
+    public VBox categorySection;
+    public TextField categoryNameField;
+    public ComboBox <ComboColor> categoryColorComboBox;
+    public Button categorySaveButton;
 
 
     //lista de categories

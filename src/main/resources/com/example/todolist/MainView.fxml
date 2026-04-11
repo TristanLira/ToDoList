@@ -11,7 +11,7 @@
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.example.todolist.MainController"
-          stylesheets="@css/main.css">
+          stylesheets="@css/main2.css">
 
     <columnConstraints>
         <ColumnConstraints percentWidth="30"/>
@@ -155,7 +155,7 @@
                     <TextArea fx:id = "taskDescriptionTextArea" GridPane.rowIndex="1" GridPane.columnIndex="1"
                               wrapText="true" GridPane.fillWidth="false" prefHeight="60"/>
                     <ComboBox fx:id = "taskCategoryComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1" GridPane.halignment="CENTER" maxWidth="Infinity"/>
-                    <DatePicker fx:id = "taskDatePicker" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
+                    <DatePicker fx:id = "taskDatePicker" GridPane.rowIndex="3" GridPane.columnIndex="1" GridPane.halignment="CENTER" maxWidth="Infinity"/>
                 </GridPane>
 
                 <Button fx:id = "taskSaveButton" onAction="#saveTask" text = " Guardar">
