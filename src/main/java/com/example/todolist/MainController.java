@@ -21,6 +21,7 @@ public class MainController {
     //menú
     public Label displayUserLabel;
     public ScrollPane sectionScrollPane;
+    public ComboBox<Category> categoryFilterComboBox;
 
     //dueSection
     public Button showDueSection;
@@ -95,6 +96,7 @@ public class MainController {
 
         //también se inicializan las listas de los models
         this.categories = FXCollections.observableArrayList();
+        this.categoryFilterComboBox.setItems(categories);
         initTasksLists();
 
         displayUserLabel.setText("Bienvenido, " + logged.getUser() + ".");
@@ -158,10 +160,9 @@ public class MainController {
         }
     }
 
-    /*PRUEBA, ELIMINAR DESPUÉS*/
-    public void filter() {
-        Category c = new Category();
-        c.setId("-OptsB6UfTgiS3GPQqZt");
+    public void filterTasks() {
+        Category c = categoryFilterComboBox.getValue();
+        if (c == null) return;
         filterByCategory(c);
     }
 

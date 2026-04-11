@@ -79,6 +79,15 @@
     -fx-padding: 8 12 8 12;
 }
 
+.filter-combobox {
+    -fx-font-size: 13px;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #7fcacb;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 4 8 4 8;
+}
+
 .combo-box .arrow-button {
     -fx-background-color: transparent;
 }
