@@ -36,7 +36,7 @@
         <HBox spacing = "20" alignment = "CENTER">
             <Button fx:id = "loginButton" onAction="#login" text = "Iniciar sesión"/>
             <Button fx:id = "registerButton" onAction="#createUser" text = "Registro"/>
-            <Button fx:id = "debugButton" onAction="#quickLogin" text = "DEBUG"/>
+            <!--Button fx:id = "debugButton" onAction="#quickLogin" text = "DEBUG"/-->
         </HBox>
     </VBox>
 

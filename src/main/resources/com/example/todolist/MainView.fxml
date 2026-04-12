@@ -71,7 +71,7 @@
                 </graphic>
             </Button>
 
-            <Button fx:id = "showReportSection" onAction = "#showReportSection" text = " Generar reportes"
+            <Button fx:id = "showReportSection" onAction = "#showReportSection" text = " Reportes y gráficos"
                     maxWidth="Infinity" styleClass="section-menu-button">
                 <graphic>
                     <FontIcon iconLiteral="fas-file-alt" styleClass="icon-section"/>
@@ -100,7 +100,7 @@
 
             <Button onAction="#removeAllFilters">
                 <graphic>
-                    <FontIcon iconLiteral="fas-trash" styleClass="icon-button"/>
+                    <FontIcon iconLiteral="fas-trash-alt" styleClass="icon-button"/>
                 </graphic>
             </Button>
         </HBox>
@@ -120,7 +120,7 @@
             <Insets top="20" right="20" bottom="20" left="20"/>
         </padding>
 
-        <StackPane maxWidth="Infinity">
+        <StackPane fx:id="sectionSpace" maxWidth="Infinity">
 
             <!--dueSection-->
             <VBox fx:id="dueSection" spacing="20">
@@ -244,6 +244,26 @@
                             <FontIcon iconLiteral="fas-save" styleClass="icon-button"/>
                         </graphic>
                     </Button>
+                </VBox>
+
+                <Label text = "Gráficos estadísticos" styleClass="section-title"/>
+
+                <!--contenedor para el gráfico-->
+                <VBox fx:id="compareChartContainer" spacing = "20" alignment="CENTER" styleClass="pie-chart-card">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                   <Label text = "Tareas completadas y no completadas" wrapText = "true" styleClass="section-subtitle"/>
+                </VBox>
+
+                <!--contenedor para el gráfico-->
+                <VBox fx:id="barChartContainer" spacing = "20" alignment="CENTER" styleClass="pie-chart-card">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20"/>
+                    </padding>
+
+                    <Label text = "Tareas por categoría" wrapText = "true" styleClass="section-subtitle"/>
                 </VBox>
 
             </VBox>

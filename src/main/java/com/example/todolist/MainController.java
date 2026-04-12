@@ -15,14 +15,15 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import org.apache.poi.ss.formula.functions.T;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MainController {
 
@@ -31,6 +32,8 @@ public class MainController {
     public ScrollPane sectionScrollPane;
     public ComboBox<Category> categoryFilterComboBox;
     public TextField textFilterField;
+
+    public StackPane sectionSpace;
 
     //dueSection
     public Button showDueSection;
@@ -66,6 +69,10 @@ public class MainController {
     public ComboBox <Category> reportCategoryComboBox;
     public ComboBox <String> reportStatusComboBox;
     public ComboBox <String> reportFileComboBox;
+    public PieChart compareChart;
+    public VBox compareChartContainer;
+    public VBox barChartContainer;
+    public BarChart<String, Number> barChart;
 
 
     //lista de categories
@@ -115,6 +122,7 @@ public class MainController {
         //inicializar las combobox de diferentes secciones
         initTaskCategoryComboBox();
         initReportComboBox();
+        initCategoryComboBox();
 
 
         //inicializar cosillas del menú
@@ -679,6 +687,77 @@ public class MainController {
 
     }
 
+    private void setCompareChart() {
+        //crea el gráfico en otro hilo para no congelar el hilo de javafx
+        Thread t = new Thread(() -> {
+            if (compareChart != null) {
+                Platform.runLater(() -> compareChartContainer.getChildren().remove(compareChart));
+            }
+
+            ObservableList<PieChart.Data> chartData = FXCollections.observableArrayList(
+                    new PieChart.Data("Tareas completadas", completed.size()),
+                    new PieChart.Data("Tareas sin completar", overdue.size())
+            );
+
+            compareChart = new PieChart(chartData);
+            compareChart.getStyleClass().add("pie-chart");
+
+            //le indica al hilo de javafx que lo agregue al contenedor
+            Platform.runLater(() -> compareChartContainer.getChildren().add(compareChart));
+        });
+
+        t.start();
+    }
+
+    private void setBarChart() {
+        //crea el gráfico en otro hilo para no congelar el hilo de javafx
+        Thread t = new Thread(() -> {
+            if (barChart != null) {
+                Platform.runLater(() -> barChartContainer.getChildren().remove(barChart));
+            }
+
+            HashMap<String, Integer> frequencies = new HashMap<>();
+
+            for (Category i: categories) {
+                frequencies.put(i.getId(), 0);
+            }
+
+            for (Task i: tasks) {
+                String id = i.getCategoryId();
+                int n = frequencies.get(id);
+                frequencies.put(id, n + 1);
+            }
+
+            CategoryAxis xAxis = new CategoryAxis();
+            xAxis.setLabel("Categorías");
+
+            NumberAxis yAxis = new NumberAxis();
+            yAxis.setLabel("Tareas");
+            yAxis.setTickUnit(1);
+            yAxis.setMinorTickCount(0);
+
+            barChart = new BarChart<>(xAxis, yAxis);
+
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+
+
+            for (Category i: categories) {
+                String name = i.getName();
+                int frequency = frequencies.get(i.getId());
+                series.getData().add(new XYChart.Data<>(name, frequency));
+            }
+
+            barChart.getData().add(series);
+            barChart.getStyleClass().add("bar-chart");
+
+            //le indica al hilo de javafx que lo agregue al contenedor
+            Platform.runLater(() -> barChartContainer.getChildren().add(barChart));
+        });
+
+        t.start();
+    }
+
+
     private void invalidReportFiltersAlert() {
         Alert a = new Alert(Alert.AlertType.WARNING);
         a.setTitle("Error al crear el reporte");
@@ -689,147 +768,41 @@ public class MainController {
     /****************************** métodos para mostrar cada sección ******************************/
 
     public void showDueSection() {
-        //mostrar todoSection
-        dueSection.setVisible(true);
-        dueSection.setManaged(true);
-
-        //ocultar las demás
-
-        categorySection.setVisible(false);
-        categorySection.setManaged(false);
-
-        taskSection.setVisible(false);
-        taskSection.setManaged(false);
-
-        completedSection.setVisible(false);
-        completedSection.setManaged(false);
-
-        overdueSection.setVisible(false);
-        overdueSection.setManaged(false);
-
-        reportSection.setVisible(false);
-        reportSection.setVisible(false);
+        showSection(dueSection);
     }
 
     public void showCategorySection(ActionEvent actionEvent) {
-        //mostrar categorySection
-        categorySection.setVisible(true);
-        categorySection.setManaged(true);
-
-        //ocultar las demás
-
-        dueSection.setVisible(false);
-        dueSection.setManaged(false);
-
-        taskSection.setVisible(false);
-        taskSection.setManaged(false);
-
-        completedSection.setVisible(false);
-        completedSection.setManaged(false);
-
-        overdueSection.setVisible(false);
-        overdueSection.setManaged(false);
-
-        reportSection.setVisible(false);
-        reportSection.setVisible(false);
-
-        //-------------------------------
-
-        cleanCategoryFields();
-        initCategoryComboBox();
+        showSection(categorySection);
     }
 
     public void showTaskSection(ActionEvent actionEvent) {
-        //mostrar taskSection
-        taskSection.setVisible(true);
-        taskSection.setManaged(true);
-
-        //ocultar las demás
-
-        dueSection.setVisible(false);
-        dueSection.setManaged(false);
-
-        categorySection.setVisible(false);
-        categorySection.setManaged(false);
-
-        completedSection.setVisible(false);
-        completedSection.setManaged(false);
-
-        overdueSection.setVisible(false);
-        overdueSection.setManaged(false);
-
-        reportSection.setVisible(false);
-        reportSection.setVisible(false);
-
-        //-------------------------------
-
-        cleanTaskFields();
+        showSection(taskSection);
     }
 
     public void showCompletedSection(ActionEvent actionEvent) {
-        completedSection.setVisible(true);
-        completedSection.setManaged(true);
-
-        //ocultar las demás
-
-        dueSection.setVisible(false);
-        dueSection.setManaged(false);
-
-        categorySection.setVisible(false);
-        categorySection.setManaged(false);
-
-        taskSection.setVisible(false);
-        taskSection.setManaged(false);
-
-        overdueSection.setVisible(false);
-        overdueSection.setManaged(false);
-
-        reportSection.setVisible(false);
-        reportSection.setVisible(false);
+        showSection(completedSection);
     }
 
     public void showOverdueSection(ActionEvent actionEvent) {
-        overdueSection.setVisible(true);
-        overdueSection.setManaged(true);
-
-        //ocultar las demás
-
-        dueSection.setVisible(false);
-        dueSection.setManaged(false);
-
-        categorySection.setVisible(false);
-        categorySection.setManaged(false);
-
-        taskSection.setVisible(false);
-        taskSection.setManaged(false);
-
-        completedSection.setVisible(false);
-        completedSection.setManaged(false);
-
-        reportSection.setVisible(false);
-        reportSection.setVisible(false);
+        showSection(overdueSection);
     }
 
     public void showReportSection(ActionEvent actionEvent) {
-        reportSection.setVisible(true);
-        reportSection.setVisible(true);
+        showSection(reportSection);
 
-        //ocultar las demás
+        //inicializa los gráficos
+        setCompareChart();
+        setBarChart();
+    }
 
-        dueSection.setVisible(false);
-        dueSection.setManaged(false);
+    private void showSection(VBox section) {
+        for (Node i: sectionSpace.getChildren()) {
+            i.setVisible(false);
+            i.setManaged(false);
+        }
 
-        categorySection.setVisible(false);
-        categorySection.setManaged(false);
-
-        taskSection.setVisible(false);
-        taskSection.setManaged(false);
-
-        completedSection.setVisible(false);
-        completedSection.setManaged(false);
-
-        overdueSection.setVisible(false);
-        overdueSection.setManaged(false);
+        section.setVisible(true);
+        section.setManaged(true);
     }
 }
 
