@@ -72,19 +72,31 @@
             </Button>
         </VBox>
 
+        <!--sección de filtros-->
+
         <VBox alignment="CENTER" spacing = "5">
-            <Label text = "Filtrar por categoria" styleClass="medium-text"/>
-            <HBox alignment="CENTER" spacing="10">
-                <ComboBox fx:id="categoryFilterComboBox" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="filter-combobox"/>
-                <Button onAction = "#filterTasks" styleClass="section-menu-button">
-                    <graphic>
-                        <FontIcon iconLiteral="fas-search" styleClass="icon-section"/>
-                    </graphic>
-                </Button>
-            </HBox>
+
+            <Label text = "Filtrar por categoria"/>
+            <ComboBox fx:id="categoryFilterComboBox" maxWidth="Infinity" HBox.hgrow="ALWAYS" styleClass="filter-combobox"/>
+
+            <Label text = "Filtrar por texto"/>
+            <TextField fx:id="textFilterField" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+
         </VBox>
 
-        <Button text = "borrar filtros" onAction="#removeAllFilters"/>
+        <HBox alignment="CENTER" spacing="30">
+            <Button onAction="#applyAllFilters">
+                <graphic>
+                    <FontIcon iconLiteral="fas-search" styleClass="icon-button"/>
+                </graphic>
+            </Button>
+
+            <Button onAction="#removeAllFilters">
+                <graphic>
+                    <FontIcon iconLiteral="fas-trash" styleClass="icon-button"/>
+                </graphic>
+            </Button>
+        </HBox>
 
     </VBox>
 

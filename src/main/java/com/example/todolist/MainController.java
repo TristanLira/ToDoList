@@ -25,6 +25,7 @@ public class MainController {
     public Label displayUserLabel;
     public ScrollPane sectionScrollPane;
     public ComboBox<Category> categoryFilterComboBox;
+    public TextField textFilterField;
 
     //dueSection
     public Button showDueSection;
@@ -126,23 +127,13 @@ public class MainController {
 
     /****************************** métodos para filtrar tareas ******************************/
 
-    private void filterByCategory(Category c) {
-        applyCategoryFilterToSection(c, dueSection);
-        applyCategoryFilterToSection(c, completedSection);
-        applyCategoryFilterToSection(c, overdueSection);
+    private void cleanFilterFields() {
+        categoryFilterComboBox.getEditor().clear();
+        categoryFilterComboBox.setValue(null);
+        textFilterField.clear();
     }
 
-    public void removeAllFilters() {
-        removeCategoryFilterToSection(dueSection);
-        removeCategoryFilterToSection(completedSection);
-        removeCategoryFilterToSection(overdueSection);
-
-        System.out.println("Overdue:");
-        for (Task i: overdue) System.out.println(i);
-        System.out.println();
-    }
-
-    private void applyCategoryFilterToSection(Category c, VBox section){
+    private void applyCategoryFilterToSection(Category c, VBox section) {
         for (Node i: section.getChildren()) {
             if (!(i instanceof TaskRow)) continue;
 
@@ -154,7 +145,22 @@ public class MainController {
         }
     }
 
-    private void removeCategoryFilterToSection(VBox section){
+    private void applyTextFilterToSection(String s, VBox section) {
+        for (Node i: section.getChildren()) {
+            if (!(i instanceof  TaskRow)) continue;
+
+            TaskRow tr = (TaskRow) i;
+
+            //oculta los taskRow que no contengan el string dentro del nombre o la descripción
+            if ( !(tr.getTask().getName().contains(s) ||
+                    tr.getTask().getDescription().contains(s)) ) {
+                tr.setVisible(false);
+                tr.setManaged(false);
+            }
+        }
+    }
+
+    private void removeFiltersToSection(VBox section){
         for (Node i: section.getChildren()) {
             if (!(i instanceof TaskRow)) continue;
             i.setVisible(true);
@@ -162,10 +168,33 @@ public class MainController {
         }
     }
 
-    public void filterTasks() {
+    public void filterTasksByCategory(Category c) {
+        applyCategoryFilterToSection(c, dueSection);
+        applyCategoryFilterToSection(c, completedSection);
+        applyCategoryFilterToSection(c, overdueSection);
+    }
+
+    public void filterTasksByText(String text) {
+        applyTextFilterToSection(text, dueSection);
+        applyTextFilterToSection(text, completedSection);
+        applyTextFilterToSection(text, overdueSection);
+    }
+
+    public void applyAllFilters() {
         Category c = categoryFilterComboBox.getValue();
-        if (c == null) return;
-        filterByCategory(c);
+        String text = textFilterField.getText();
+
+        removeAllFilters();
+
+        if (c != null) filterTasksByCategory(c);
+        if (text != null && !text.isEmpty()) filterTasksByText(text);
+    }
+
+    public void removeAllFilters() {
+        removeFiltersToSection(dueSection);
+        removeFiltersToSection(completedSection);
+        removeFiltersToSection(overdueSection);
+        cleanFilterFields();
     }
 
     /****************************** métodos para categorySection ******************************/
