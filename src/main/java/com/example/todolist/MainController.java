@@ -4,6 +4,8 @@ import com.example.todolist.controls.CategoryRow;
 import com.example.todolist.controls.ComboColor;
 import com.example.todolist.controls.TaskRow;
 import com.example.todolist.models.*;
+import com.example.todolist.reports.ReportStrategy;
+import com.example.todolist.reports.StrategyFactory;
 import config.CategoryDAO;
 import config.TaskDAO;
 import config.UserDAO;
@@ -16,8 +18,11 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import org.apache.poi.ss.formula.functions.T;
 
+import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class MainController {
 
@@ -54,6 +59,13 @@ public class MainController {
     public TextField categoryNameField;
     public ComboBox <ComboColor> categoryColorComboBox;
     public Button categorySaveButton;
+
+    //reportSection
+    public Button showReportSection;
+    public VBox reportSection;
+    public ComboBox <Category> reportCategoryComboBox;
+    public ComboBox <String> reportStatusComboBox;
+    public ComboBox <String> reportFileComboBox;
 
 
     //lista de categories
@@ -99,6 +111,11 @@ public class MainController {
 
         //también se inicializan las listas de los models
         initTasksLists();
+
+        //inicializar las combobox de diferentes secciones
+        initTaskCategoryComboBox();
+        initReportComboBox();
+
 
         //inicializar cosillas del menú
         displayUserLabel.setText("Bienvenido, " + logged.getUser() + ".");
@@ -201,7 +218,7 @@ public class MainController {
 
     private void cleanCategoryFields() {
         categoryNameField.clear();
-        categoryColorComboBox.setPromptText("Seleccione su color");
+        categoryColorComboBox.setValue(null);
     }
 
     public void saveCategory(ActionEvent actionEvent) {
@@ -294,7 +311,7 @@ public class MainController {
     private void cleanTaskFields() {
         taskNameField.clear();
         taskDescriptionTextArea.clear();
-        taskCategoryComboBox.getEditor().clear();
+        taskCategoryComboBox.setValue(null);
         taskDatePicker.getEditor().clear();
     }
 
@@ -330,6 +347,8 @@ public class MainController {
                 taskNameField.getText(),
                 taskDescriptionTextArea.getText(),
                 taskDatePicker.getValue());
+
+        t.setCategoryName(c.getName());
 
         cleanTaskFields();
         return t;
@@ -574,6 +593,99 @@ public class MainController {
         children.add(tr);
     }
 
+    /****************************** métodos para reportSection (generación de reportes) ******************************/
+
+    public void generateReport() {
+        //revisa que se haya seleccionado algo en los filtros
+        if (reportStatusComboBox.getValue() == null || reportStatusComboBox.getValue().isEmpty()
+                || reportFileComboBox.getValue() == null || reportFileComboBox.getValue().isEmpty()) {
+            System.out.println("El reporte no fue creado");
+            cleanReportComboBox();
+            invalidReportFiltersAlert();
+            return;
+        }
+
+        //obtiene la lista según el estatus
+        ObservableList<Task> tasksToReport = getTasksToReport();
+
+        //si se selecciona un filtro de categoria elimina todas las tareas que no pertenezcan a esa categoria
+        if (reportCategoryComboBox.getValue() != null) {
+            Category c = reportCategoryComboBox.getValue();
+            tasksToReport.removeIf(i -> !i.getCategoryId().equals(c.getId()));
+        }
+
+        //ahora que la lista está correctamente filtrada genera la estrategia correspondiente
+        ReportStrategy report = StrategyFactory.getStrategy(reportFileComboBox.getValue());
+
+        cleanReportComboBox();
+
+        //crea el reporte dentro de un nuevo hilo para no bloquear el hilo de java fx
+        Thread reportThread = new Thread(() -> {
+            try {
+                report.createReport(tasksToReport);
+            } catch (IOException e) {
+                System.out.println("Error al crear el reporte: " + e);
+            }
+        });
+
+        reportThread.start();
+    }
+
+    //selecciona una lista con la que escribirá el reporte según el filtro
+    private ObservableList<Task> getTasksToReport () {
+        ObservableList<Task> list = FXCollections.observableArrayList();
+
+        switch (reportStatusComboBox.getValue()) {
+            case "Todas las tareas":
+                list.addAll(tasks);
+                break;
+
+            case "Completada":
+                list.addAll(completed);
+                break;
+
+            case "Sin completar":
+                list.addAll(due);
+                break;
+
+            case "Vencida":
+                list.addAll(overdue);
+                break;
+        }
+
+        return list;
+    }
+
+    private void cleanReportComboBox() {
+        reportCategoryComboBox.setValue(null);
+        reportStatusComboBox.setValue(null);
+        reportFileComboBox.setValue(null);
+    }
+
+    private void initReportComboBox() {
+        reportCategoryComboBox.setItems(categories);
+
+        ObservableList<String> status = FXCollections.observableArrayList(
+                "Todas las tareas",
+                "Completada",
+                "Sin completar",
+                "Vencida");
+        reportStatusComboBox.setItems(status);
+
+        ObservableList<String> file = FXCollections.observableArrayList(
+                "PDF",
+                "XLSX");
+        reportFileComboBox.setItems(file);
+
+    }
+
+    private void invalidReportFiltersAlert() {
+        Alert a = new Alert(Alert.AlertType.WARNING);
+        a.setTitle("Error al crear el reporte");
+        a.setContentText("No se pudo crear el reporte. Por favor seleccione el estatus y archivo.");
+        a.show();
+    }
+
     /****************************** métodos para mostrar cada sección ******************************/
 
     public void showDueSection() {
@@ -594,6 +706,9 @@ public class MainController {
 
         overdueSection.setVisible(false);
         overdueSection.setManaged(false);
+
+        reportSection.setVisible(false);
+        reportSection.setVisible(false);
     }
 
     public void showCategorySection(ActionEvent actionEvent) {
@@ -614,6 +729,9 @@ public class MainController {
 
         overdueSection.setVisible(false);
         overdueSection.setManaged(false);
+
+        reportSection.setVisible(false);
+        reportSection.setVisible(false);
 
         //-------------------------------
 
@@ -640,10 +758,12 @@ public class MainController {
         overdueSection.setVisible(false);
         overdueSection.setManaged(false);
 
+        reportSection.setVisible(false);
+        reportSection.setVisible(false);
+
         //-------------------------------
 
         cleanTaskFields();
-        initTaskCategoryComboBox();
     }
 
     public void showCompletedSection(ActionEvent actionEvent) {
@@ -663,6 +783,9 @@ public class MainController {
 
         overdueSection.setVisible(false);
         overdueSection.setManaged(false);
+
+        reportSection.setVisible(false);
+        reportSection.setVisible(false);
     }
 
     public void showOverdueSection(ActionEvent actionEvent) {
@@ -682,6 +805,31 @@ public class MainController {
 
         completedSection.setVisible(false);
         completedSection.setManaged(false);
+
+        reportSection.setVisible(false);
+        reportSection.setVisible(false);
+    }
+
+    public void showReportSection(ActionEvent actionEvent) {
+        reportSection.setVisible(true);
+        reportSection.setVisible(true);
+
+        //ocultar las demás
+
+        dueSection.setVisible(false);
+        dueSection.setManaged(false);
+
+        categorySection.setVisible(false);
+        categorySection.setManaged(false);
+
+        taskSection.setVisible(false);
+        taskSection.setManaged(false);
+
+        completedSection.setVisible(false);
+        completedSection.setManaged(false);
+
+        overdueSection.setVisible(false);
+        overdueSection.setManaged(false);
     }
 }
 

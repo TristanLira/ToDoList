@@ -16,6 +16,7 @@ public class Task {
     private String deadline;
     private LocalDate creationObj;
     private LocalDate deadlineObj;
+    private String categoryName;
 
     private boolean completed;
 
@@ -126,6 +127,14 @@ public class Task {
     @Exclude
     public void setUiRow(TaskRow uiRow) {
         this.uiRow = uiRow;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
     }
 
     @Override

@@ -40,7 +40,20 @@ dependencies {
     implementation("org.kordamp.ikonli:ikonli-fontawesome5-pack:12.3.1")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
+    //firebase
     implementation("com.google.firebase:firebase-admin:9.8.0")
+
+    //iText
+    implementation("com.itextpdf:itext-core:9.5.0")
+    implementation("org.apache.logging.log4j:log4j-api:2.25.3")
+    implementation("org.apache.logging.log4j:log4j-core:2.25.3")
+    implementation("org.slf4j:slf4j-api:2.0.17")
+    implementation("org.slf4j:slf4j-simple:2.0.17")
+
+    //apache poi
+    implementation("org.apache.poi:poi-ooxml:5.5.1")
+    implementation("org.apache.poi:poi:5.5.1")
 }
 
 tasks.withType<Test> {

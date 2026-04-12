@@ -70,6 +70,13 @@
                     <FontIcon iconLiteral="fas-edit" styleClass="icon-section"/>
                 </graphic>
             </Button>
+
+            <Button fx:id = "showReportSection" onAction = "#showReportSection" text = " Generar reportes"
+                    maxWidth="Infinity" styleClass="section-menu-button">
+                <graphic>
+                    <FontIcon iconLiteral="fas-file-alt" styleClass="icon-section"/>
+                </graphic>
+            </Button>
         </VBox>
 
         <!--sección de filtros-->
@@ -192,7 +199,7 @@
                         <Label alignment="CENTER_RIGHT" text = "nombre:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="medium-text"/>
                         <Label alignment="CENTER_RIGHT" text = "color:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="medium-text"/>
                         <TextField fx:id = "categoryNameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                        <ComboBox fx:id = "categoryColorComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
+                        <ComboBox fx:id = "categoryColorComboBox" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.halignment="CENTER"/>
                     </GridPane>
 
                     <Button fx:id = "categorySaveButton" onAction="#saveCategory" text = " Guardar">
@@ -206,6 +213,39 @@
 
                 <Label text = "Ten cuidado al eliminar categorías. Al eliminar una categoría también eliminarás permanentemente todas las tareas asociadas a ella."
                        wrapText="true" styleClass = "medium-text"/>
+            </VBox>
+
+            <!--reportSection-->
+            <VBox fx:id="reportSection" spacing="30">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20"/>
+                </padding>
+
+                <Label text = "Generar reportes y gráficos" styleClass="section-title"/>
+
+                <VBox alignment="CENTER" spacing="20" fillWidth="false">
+                    <Label text = "Reporte" styleClass="section-subtitle"/>
+
+                    <!--formulario-->
+                    <GridPane alignment="CENTER" maxWidth="Infinity" hgap = "10" vgap="10" styleClass="grid-card">
+                        <padding>
+                            <Insets top="20" right="20" bottom="20" left="20"/>
+                        </padding>
+                        <Label text = "Categoría:" GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="medium-text"/>
+                        <Label text = "Estatus:" GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="medium-text"/>
+                        <Label text = "Archivo:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="medium-text"/>
+                        <ComboBox fx:id = "reportCategoryComboBox" prefWidth="200" GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" GridPane.halignment="CENTER"/>
+                        <ComboBox fx:id = "reportStatusComboBox" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity" GridPane.halignment="CENTER"/>
+                        <ComboBox fx:id = "reportFileComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="Infinity" GridPane.halignment="CENTER"/>
+                    </GridPane>
+
+                    <Button onAction = "#generateReport" text = " Generar reporte">
+                        <graphic>
+                            <FontIcon iconLiteral="fas-save" styleClass="icon-button"/>
+                        </graphic>
+                    </Button>
+                </VBox>
+
             </VBox>
 
         </StackPane>
