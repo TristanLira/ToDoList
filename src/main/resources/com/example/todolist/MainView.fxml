@@ -191,6 +191,9 @@
                 </VBox>
 
                 <Label text = "Tus categorías" styleClass = "section-subtitle"/>
+
+                <Label text = "Ten cuidado al eliminar categorías. Al eliminar una categoría también eliminarás permanentemente todas las tareas asociadas a ella."
+                       wrapText="true" styleClass = "medium-text"/>
             </VBox>
 
         </StackPane>

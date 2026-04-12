@@ -1,4 +1,4 @@
-package com.example.todolist.models;
+package com.example.todolist.controls;
 
 import javafx.scene.paint.Color;
 

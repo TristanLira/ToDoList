@@ -1,5 +1,7 @@
-package com.example.todolist.models;
+package com.example.todolist.controls;
 
+import com.example.todolist.models.Category;
+import com.example.todolist.models.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;

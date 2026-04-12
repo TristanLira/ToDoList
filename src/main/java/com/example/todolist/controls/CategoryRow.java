@@ -1,6 +1,6 @@
-package com.example.todolist.models;
+package com.example.todolist.controls;
 
-import com.google.apps.card.v1.Grid;
+import com.example.todolist.models.Category;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.VPos;
@@ -17,19 +17,22 @@ public class CategoryRow extends GridPane {
     private final Label colorLabel;
     private final Label nameLabel;
     private final Button deleteButton;
+    private final FontIcon deleteIcon;
 
     public CategoryRow(Category c) {
         super();
         this.c = c;
         colorLabel = new Label();
         nameLabel = new Label(c.getName());
-        deleteButton = new Button("Eliminar");
+        //deleteButton = new Button("Eliminar");
+        deleteButton = new Button();
 
-        FontIcon icon = new FontIcon("fas-eraser");
-        icon.setIconColor(Color.WHITE);
-        deleteButton.setGraphic(icon);
+        deleteIcon = new FontIcon("fas-trash-alt");
+        deleteIcon.setIconColor(Color.WHITE);
+        deleteButton.setGraphic(deleteIcon);
 
         build();
+        addCss();
     }
 
     private void build() {
@@ -51,11 +54,19 @@ public class CategoryRow extends GridPane {
         //centra el botón y el indicador del color
 
         GridPane.setHalignment(colorLabel, HPos.CENTER);
-        GridPane.setHalignment(deleteButton, HPos.CENTER);
+        GridPane.setHalignment(deleteButton, HPos.RIGHT);
 
         GridPane.setValignment(colorLabel, VPos.CENTER);
         GridPane.setValignment(nameLabel, VPos.CENTER);
         GridPane.setValignment(deleteButton, VPos.CENTER);
+    }
+
+    private void addCss() {
+        /*originalmente la clase no implementaba su propio css, pero al agregarle styleClass a los componentes
+        decidí reutilizar las clases que originalmente solo eran para taskRow*/
+        this.getStyleClass().add("task-row");
+        deleteButton.getStyleClass().add("task-complete-button");
+        deleteIcon.getStyleClass().add("icon-button");
     }
 
     public Button getDeleteButton() {
