@@ -345,8 +345,8 @@
     -fx-stroke-width: 1.5;
 }
 
-.pie-chart .data0.chart-pie { -fx-pie-color: #66bb6a; }
-.pie-chart .data1.chart-pie { -fx-pie-color: #d4f1ca; }
+.pie-chart .data0.chart-pie { -fx-pie-color: #616161; }
+.pie-chart .data1.chart-pie { -fx-pie-color: #d0d0d0; }
 
 /* Efecto hover para los sectores */
 .pie-chart .data0.chart-pie:hover,

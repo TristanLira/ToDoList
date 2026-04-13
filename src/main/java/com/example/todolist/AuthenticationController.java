@@ -143,14 +143,4 @@ public class AuthenticationController {
         a.setContentText("Este nombre de usuario ya está siendo utilizado, por favor escoja otro.");
         a.show();
     }
-
-    /********************** DEBUG ***************************/
-
-    public void quickLogin(ActionEvent actionEvent) {
-        try {
-            goToMainScene(actionEvent, new User("TristanLira", "password"));
-        } catch (IOException e) {
-            System.out.println("error al cargar la escena: " + e);
-        }
-    }
 }

@@ -691,7 +691,7 @@ public class MainController {
         //crea el gráfico en otro hilo para no congelar el hilo de javafx
         Thread t = new Thread(() -> {
             if (compareChart != null) {
-                Platform.runLater(() -> compareChartContainer.getChildren().remove(compareChart));
+                Platform.runLater(() -> compareChartContainer.getChildren().clear());
             }
 
             ObservableList<PieChart.Data> chartData = FXCollections.observableArrayList(
@@ -713,7 +713,7 @@ public class MainController {
         //crea el gráfico en otro hilo para no congelar el hilo de javafx
         Thread t = new Thread(() -> {
             if (barChart != null) {
-                Platform.runLater(() -> barChartContainer.getChildren().remove(barChart));
+                Platform.runLater(() -> barChartContainer.getChildren().clear());
             }
 
             HashMap<String, Integer> frequencies = new HashMap<>();
