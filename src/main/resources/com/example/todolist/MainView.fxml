@@ -11,7 +11,7 @@
 <GridPane xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.example.todolist.MainController"
-          stylesheets="@css/main2.css">
+          stylesheets="@css/main.css">
 
     <columnConstraints>
         <ColumnConstraints percentWidth="30"/>
@@ -216,7 +216,7 @@
             </VBox>
 
             <!--reportSection-->
-            <VBox fx:id="reportSection" spacing="30">
+            <VBox fx:id="reportSection" spacing="30" alignment="CENTER">
                 <padding>
                     <Insets top="20" right="20" bottom="20" left="20"/>
                 </padding>

@@ -62,7 +62,7 @@ public class TaskRow extends HBox {
     }
 
     private String getTimeLeft() {
-        Period p = Period.between(t.obtainCreationObj(), t.obtainDeadlineObj());
+        Period p = Period.between(t.getCreationObj(), t.getDeadlineObj());
 
         ArrayList<String> dateList = new ArrayList<>();
 
@@ -132,7 +132,7 @@ public class TaskRow extends HBox {
         buttonIcon.getStyleClass().add("icon-button");
 
         //css dinámico para respetar el color de la categoryLabel
-        categoryLabel.setStyle("-fx-background-color: " + getHexColor(c.obtainColorObj()) + ";" +
+        categoryLabel.setStyle("-fx-background-color: " + getHexColor(c.getColorObj()) + ";" +
                         "-fx-background-radius: 10;");
     }
 
@@ -153,7 +153,7 @@ public class TaskRow extends HBox {
     }
 
     public LocalDate getDeadline() {
-        return t.obtainDeadlineObj();
+        return t.getDeadlineObj();
     }
 
     //desactiva la opción para marcar la tarea como completada

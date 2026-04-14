@@ -35,10 +35,6 @@ public class PDFReport implements ReportStrategy {
         document.add(getParagraph("", title, 18));
 
         for (Task i: tasks) {
-            //crea un objeto con el id de la categoria para intentar buscarlo en la lista
-            Category c = new Category();
-            c.setId(i.getCategoryId());
-
             String taskReport = "Descripción: " + i.getDescription() +
                     "\nFecha de creación:" + i.getCreation() +
                     "\nFecha límite: " + i.getDeadline() +

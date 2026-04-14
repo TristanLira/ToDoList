@@ -25,6 +25,7 @@ public class Task {
     public Task(String userId, String categoryId, String name, String description, LocalDate deadlineObj) {
         this.userId = userId;
         this.categoryId = categoryId;
+        this.id = "";
         this.name = name;
         this.description = description;
         this.deadlineObj = deadlineObj;
@@ -35,19 +36,17 @@ public class Task {
         this.creation = creationObj.toString();
 
         completed = false;
-
-        uiRow = null;
     }
 
     public Task() {}
 
     @Exclude
-    public LocalDate obtainCreationObj() {
+    public LocalDate getCreationObj() {
         return creationObj;
     }
 
     @Exclude
-    public LocalDate obtainDeadlineObj() {
+    public LocalDate getDeadlineObj() {
         return deadlineObj;
     }
 

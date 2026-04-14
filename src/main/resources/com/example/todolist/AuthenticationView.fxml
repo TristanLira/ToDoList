@@ -10,9 +10,10 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.control.TextField?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.todolist.AuthenticationController"
-      stylesheets="@css/authentication2.css"
+      stylesheets="@css/authentication.css"
       alignment="CENTER"
       spacing="30">
 
@@ -34,9 +35,17 @@
         </GridPane>
 
         <HBox spacing = "20" alignment = "CENTER">
-            <Button fx:id = "loginButton" onAction="#login" text = "Iniciar sesión"/>
-            <Button fx:id = "registerButton" onAction="#createUser" text = "Registro"/>
-            <!--Button fx:id = "debugButton" onAction="#quickLogin" text = "DEBUG"/-->
+            <Button fx:id = "loginButton" onAction="#login" text = " Iniciar sesión">
+                <graphic>
+                    <FontIcon iconLiteral="fas-user" styleClass="icon-button"/>
+                </graphic>
+            </Button>
+
+            <Button fx:id = "registerButton" onAction="#createUser" text = "Registro">
+                <graphic>
+                    <FontIcon iconLiteral="fas-plus-square" styleClass="icon-button"/>
+                </graphic>
+            </Button>
         </HBox>
     </VBox>
 

@@ -87,8 +87,8 @@ public class TaskDAO implements DAO <Task>{
             System.out.println("completed");
         }
         //si la fecha de vencimiento aún no pasa la clasifica como pendiente
-        else if(t.obtainDeadlineObj().isAfter(LocalDate.now()) ||
-                t.obtainDeadlineObj().isEqual(LocalDate.now())) {
+        else if(t.getDeadlineObj().isAfter(LocalDate.now()) ||
+                t.getDeadlineObj().isEqual(LocalDate.now())) {
             due.add(t);
             System.out.println("due");
         }
@@ -122,7 +122,7 @@ public class TaskDAO implements DAO <Task>{
         }
 
         //no crea la tarea si la fecha ya pasó
-        if (t.obtainDeadlineObj().isBefore(LocalDate.now())) {
+        if (t.getDeadlineObj().isBefore(LocalDate.now())) {
             System.out.println("No fue posible crear la tarea \"" + t.getName() + "\" porque la fecha ya paso.");
             return;
         }
@@ -160,7 +160,7 @@ public class TaskDAO implements DAO <Task>{
         }
 
         //no crea la tarea si la fecha ya pasó
-        if (t.obtainDeadlineObj().isBefore(LocalDate.now())) {
+        if (t.getDeadlineObj().isBefore(LocalDate.now())) {
             System.out.println("No fue posible crear la tarea \"" + t.getName() + "\" porque la fecha ya paso.");
             Platform.runLater(fail);
             return;

@@ -233,7 +233,9 @@ public class MainController {
         Category c = getCategoryFromFields();
 
         /*si no se escribe correctamente llama a la alerta para indicar al usuario del error.*/
-        catDAO.create(c, () -> { System.out.println("Categoria guardada en firebase: " + c); }, () -> invalidCategoryNameAlert());
+        catDAO.create(c,
+                () -> System.out.println("Categoria guardada en firebase: " + c),
+                () -> invalidCategoryNameAlert());
     }
 
     private Category getCategoryFromFields() {
@@ -337,12 +339,9 @@ public class MainController {
         }
 
         //escribir en la base de datos
-        taskDAO.create(t, new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("tarea agregada a firebase exitosamente: " + t.getName() + "\n");
-            }
-        }, () -> invalidTaskAlert());
+        taskDAO.create(t,
+                () -> System.out.println("tarea agregada a firebase exitosamente: " + t.getName() + "\n"),
+                () -> invalidTaskAlert());
     }
 
     private Task getTaskFromFields() {
@@ -419,9 +418,7 @@ public class MainController {
     private void createTaskRow(Task t) {
         Category c = catDAO.get(t.getCategoryId());
 
-        if (t == null || c == null) {
-            return;
-        }
+        if (t == null || c == null) return;
 
         TaskRow tr = new TaskRow(t, c);
         t.setUiRow(tr); //le asigna al model su representación en la gui

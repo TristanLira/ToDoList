@@ -42,7 +42,7 @@ public class CategoryDAO implements DAO<Category> {
                 Category c = dataSnapshot.getValue(Category.class);
 
                 /*ya que en el metodo equals de category son iguales solo si tienen el mismo id, se remueve de la lista
-                la category que tenga el id recuperado y y se agrega de nuevo modificada*/
+                la category que tenga el id recuperado y se agrega de nuevo modificada*/
                 categories.remove(c);
                 categories.add(c);
             }

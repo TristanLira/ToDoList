@@ -54,15 +54,12 @@ public class Category {
 
     public void setColor(String color) {
         this.color = color;
-        setColorObj();
-    }
-
-    public Color obtainColorObj() {
-        return colorObj;
-    }
-
-    private void setColorObj() {
         colorObj = Color.web(color);
+    }
+
+    @Exclude
+    public Color getColorObj() {
+        return colorObj;
     }
 
     //excluye el row de escribirse o leerse por la base de datos

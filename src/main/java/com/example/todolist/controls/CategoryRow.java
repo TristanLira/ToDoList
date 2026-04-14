@@ -44,7 +44,7 @@ public class CategoryRow extends GridPane {
         c2.setPercentWidth(30);
         this.getColumnConstraints().addAll(c0, c1, c2);
 
-        colorLabel.setBackground(new Background(new BackgroundFill(c.obtainColorObj(), CornerRadii.EMPTY, Insets.EMPTY)));
+        colorLabel.setBackground(new Background(new BackgroundFill(c.getColorObj(), CornerRadii.EMPTY, Insets.EMPTY)));
         colorLabel.setPrefSize(20, 20);
 
         this.add(colorLabel, 0, 0);

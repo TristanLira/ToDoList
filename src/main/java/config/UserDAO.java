@@ -10,7 +10,7 @@ import java.util.regex.*;
 
 public class UserDAO implements DAO<User> {
 
-    //regex para validar usuarios y contraseñas
+    //regex para validar usuarios
     public static final String USER_REGEX = "[a-zA-Z0-9_-]*";
     private final Pattern pattern;
 

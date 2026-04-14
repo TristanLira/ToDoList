@@ -28,9 +28,6 @@ public class ExcelReport implements ReportStrategy {
             if (!tasks.isEmpty()) cells[i] = getRow(tasks.remove(0));
         }
 
-        printMatrix(cells);
-
-
         for (int i = 0; i < cells.length; i++) {
             Row row = sheet.createRow(i);
 
